@@ -125,9 +125,11 @@
     <None Include="svpng.inc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="IntersectResult.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Ray.h" />
+    <ClInclude Include="Shape.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -19,7 +19,7 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Trangle.cpp">
-      <Filter>头文件</Filter>
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -32,6 +32,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Ray.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Shape.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="IntersectResult.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Material.h">

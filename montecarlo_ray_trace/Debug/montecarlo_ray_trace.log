@@ -1,3 +1,3 @@
 ﻿  main.cpp
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\main.cpp(73): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\main.cpp(111): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
   montecarlo_ray_trace.vcxproj -> D:\course\CG\montecarlo_ray_trace\Debug\montecarlo_ray_trace.exe
