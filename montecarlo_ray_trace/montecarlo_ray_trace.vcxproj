@@ -118,6 +118,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DataFrame.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Trangle.cpp" />
   </ItemGroup>
@@ -125,6 +127,8 @@
     <None Include="svpng.inc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="DataFrame.h" />
     <ClInclude Include="IntersectResult.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Material.h" />

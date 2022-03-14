@@ -42,29 +42,6 @@ void test_rgba(void) {
 	fclose(fp);
 }
 
-// 输出 SRC 数组中的数据到图像
-void imshow(double* SRC, int WIDTH, int HEIGHT)
-{
-
-	unsigned char* image = new unsigned char[WIDTH * HEIGHT * 3];// 图像buffer
-	unsigned char* p = image;
-	double* S = SRC;    // 源数据
-
-	FILE* fp;
-	fopen_s(&fp, "image.png", "wb");
-
-	for (int i = 0; i < HEIGHT; i++)
-	{
-		for (int j = 0; j < WIDTH; j++)
-		{
-			*p++ = (unsigned char)clamp((*S++) * 255, 0.0, 255.0);  // R 通道
-			*p++ = (unsigned char)clamp((*S++) * 255, 0.0, 255.0);  // G 通道
-			*p++ = (unsigned char)clamp((*S++) * 255, 0.0, 255.0);  // B 通道
-		}
-	}
-
-	svpng(fp, WIDTH, HEIGHT, image, 0);
-}
 
 // 返回距离最近 hit 的结果
 IntersectResult shoot(vector<Shape*>& shapes, Ray ray)
