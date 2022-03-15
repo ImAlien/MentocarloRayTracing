@@ -18,41 +18,21 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Trangle.cpp">
+    <ClCompile Include="obj\Obj.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="DataFrame.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="material\Material.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="svpng.inc">
+    <ClInclude Include="include\tiny_obj_loader.h">
       <Filter>头文件</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
+    </ClInclude>
+    <ClInclude Include="obj\Obj.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="main.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Ray.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Shape.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="IntersectResult.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DataFrame.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
