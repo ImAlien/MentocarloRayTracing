@@ -12,3 +12,6 @@ Material::Material(tinyobj::material_t mt) {
 	this->specular_highlight_texname = mt.specular_highlight_texname;
 	this->Ns = mt.shininess;
 }
+Material::Material() {
+	this->Ka = glm::vec3(0, 0, 0);
+}

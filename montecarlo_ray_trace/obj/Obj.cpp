@@ -8,24 +8,14 @@
 #include<glm/glm.hpp>
 using namespace std;
 
-void Obj::loadFile(string filename) {
-	int n = filename.size();
-	int idx = -1;
-	for (int i = n - 1; i >= 0; i--) {
-		if (filename[i] == '/') {
-			idx = i; break;
-		}
-	}
-	std::string pathname = "./";
-	if (idx > 0) {
-		pathname = filename.substr(0, idx);
-	}
-	loadFile(pathname, filename.substr(idx + 1));
+string getPath(string filename) {
+	int pos = filename.find_last_of('/');
+	return filename.substr(0, pos);
 }
-void Obj::loadFile(string filepath, string filename) {
+void Obj::loadFile(string filename) {
 	string inputfile = filename;
 	tinyobj::ObjReaderConfig reader_config;
-	reader_config.mtl_search_path = filepath; // Path to material files
+	reader_config.mtl_search_path = getPath(filename); // Path to material files
 
 	tinyobj::ObjReader reader;
 
@@ -49,7 +39,8 @@ void Obj::loadFile(string filepath, string filename) {
 		// Loop over faces(polygon)
 		size_t index_offset = 0;
 		int faces_nums = shapes[s].mesh.num_face_vertices.size();
-		cout << faces_nums << endl;
+		cout << s << ' '<< faces_nums << endl;
+		this->nface += faces_nums;
 		for (size_t f = 0; f < faces_nums; f++) {
 			Shape* cur_face = new Shape();
 			size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
@@ -91,6 +82,5 @@ void Obj::loadFile(string filepath, string filename) {
 			faces.push_back(cur_face);
 		}
 	}
-	this->nface = shapes.size();
 	//cout << "load success" << endl;
 }

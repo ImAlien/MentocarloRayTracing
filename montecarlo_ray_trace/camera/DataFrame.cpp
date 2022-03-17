@@ -2,6 +2,7 @@
 #include<iostream>
 #include<glm/glm.hpp>
 
+using namespace std;
 DataFrame::DataFrame(int w, int h) {
 	this->HEIGHT = h;
 	this->WIDTH = w;

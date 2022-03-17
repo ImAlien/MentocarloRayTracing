@@ -14,4 +14,5 @@ public:
 	std::string specular_texname;            // map_Ks
 	std::string specular_highlight_texname;  // map_Ns
 	Material(tinyobj::material_t);
+	Material();
 };

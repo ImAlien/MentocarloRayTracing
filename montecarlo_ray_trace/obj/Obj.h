@@ -10,9 +10,6 @@ public:
 	Obj() {}
 	Obj(std::string filename) {
 		loadFile(filename);
-		createTable();
 	}
 	void loadFile(std::string filename);//¼ÓÔØ³öfaces
-	void loadFile(std::string filepath, std::string filename);
-	void createTable();
 };
