@@ -7,6 +7,8 @@
 #include"camera/DataFrame.h"
 #include"camera/Camera.h"
 #include"obj/Obj.h"
+#include"scene/scene.h"
+#include"test/Log.h"
 #include<vector>
 #include<iostream>
 #include<stdio.h>
@@ -19,11 +21,13 @@ const glm::vec3 RED(1, 0.5, 0.5);
 DataFrame* DF;
 Obj* GOBJ;
 Camera* GCamera;
+Scene* GScene;
 int main(void) {
-	//DF = new DataFrame(400, 500);
-	GOBJ = new Obj();
-	//GOBJ->loadFile("./scenes/bedroom/bedroom.obj");
-	GCamera = new Camera("bedroom");
+	//GOBJ = new Obj();
+	//GOBJ->loadFile("./scenes/bunny/bunny.obj");
+	LOG("---------------------new main----------------------");
+	GScene = new Scene("bunny");
+	GCamera = new Camera();
 	//cout << GCamera->width << "  " << GCamera->height << endl;
 	system("pause");                        
 	return 0;

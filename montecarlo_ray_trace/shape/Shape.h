@@ -27,11 +27,13 @@ class Triangle : public Shape
 {
 public:
 	glm::vec3 p1, p2, p3;    // 三顶点
+	glm::vec3 normal;
 	Triangle() {}
 	Triangle(glm::vec3 P1, glm::vec3 P2, glm::vec3 P3)
 	{
 		p1 = P1, p2 = P2, p3 = P3;
+		normal = glm::normalize(glm::cross(p2 - p1, p3 - p2));
 	}
 	// 与光线求交
-	IntersectResult* intersect(Ray* ray);
+	//IntersectResult* intersect(Ray* ray);
 };

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -118,14 +118,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BVH\BoundingBox.cpp" />
+    <ClCompile Include="BVH\BVH.cpp" />
     <ClCompile Include="camera\Camera.cpp" />
     <ClCompile Include="camera\DataFrame.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="material\Material.cpp" />
     <ClCompile Include="obj\Obj.cpp" />
+    <ClCompile Include="scene\scene.cpp" />
     <ClCompile Include="shape\Trangle.cpp" />
+    <ClCompile Include="test\Log.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BVH\BoundingBox.h" />
+    <ClInclude Include="BVH\BVH.h" />
     <ClInclude Include="camera\Camera.h" />
     <ClInclude Include="camera\DataFrame.h" />
     <ClInclude Include="include\tiny_obj_loader.h" />
@@ -136,6 +142,7 @@
     <ClInclude Include="ray\Ray.h" />
     <ClInclude Include="scene\scene.h" />
     <ClInclude Include="shape\Shape.h" />
+    <ClInclude Include="test\Log.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\svpng.inc" />

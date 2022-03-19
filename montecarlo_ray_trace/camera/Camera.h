@@ -12,6 +12,7 @@ public:
 	glm::vec3 up;
 	double fovy;
 	int width, height;
+	Camera();
 	Camera(std::string scenename);
 	Camera(std::string type_, glm::vec3 eye_, glm::vec3 lookat, glm::vec3 up,
 		double foxy_, int w_, int h_);

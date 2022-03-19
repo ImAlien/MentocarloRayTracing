@@ -11,6 +11,9 @@ void Camera::saveImage(DataFrame* df) {
 	svpng(fp, df->WIDTH, df->HEIGHT, df->image, 0);
 	fclose(fp);
 }
+Camera::Camera() {
+	defaultCamera();
+}
 Camera::Camera(string scenename) {
 	if (scenename == "bedroom") {
 		bedroomCamera();

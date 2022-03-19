@@ -33,13 +33,12 @@ void Obj::loadFile(string filename) {
 	auto& attrib = reader.GetAttrib();
 	auto& shapes = reader.GetShapes();
 	auto& materials = reader.GetMaterials();
-	//cout << shapes.size() << endl;
 	// Loop over shapes
 	for (size_t s = 0; s < shapes.size(); s++) {
 		// Loop over faces(polygon)
 		size_t index_offset = 0;
 		int faces_nums = shapes[s].mesh.num_face_vertices.size();
-		cout << s << ' '<< faces_nums << endl;
+		//cout << s << ' '<< faces_nums << endl;
 		this->nface += faces_nums;
 		for (size_t f = 0; f < faces_nums; f++) {
 			Shape* cur_face = new Shape();
@@ -78,9 +77,21 @@ void Obj::loadFile(string filename) {
 			
 			// per-face material
 			int mtl_id = shapes[s].mesh.material_ids[f];
-			cur_face->material = new Material(materials[mtl_id]);
+			if(mtl_id >= 0)
+				cur_face->material = new Material(materials[mtl_id]);
 			faces.push_back(cur_face);
 		}
 	}
+
+	cout << nface <<"个面片加载完成" << endl;
+	createTriangles();
+	cout << "三角形面片加载完成" << endl;
 	//cout << "load success" << endl;
+}
+
+void Obj::createTriangles() {
+	for (Shape* shape : faces) {
+		triangles.push_back(new Triangle(shape->points[0].pos, shape->points[1].pos, 
+			shape->points[2].pos));
+	}
 }
