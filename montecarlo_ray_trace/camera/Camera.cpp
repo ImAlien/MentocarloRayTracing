@@ -1,6 +1,6 @@
 #include "Camera.h"
 #include "../include/svpng.inc"
-
+#include <iostream>
 
 
 
@@ -20,6 +20,9 @@ Camera::Camera(string scenename) {
 	}
 	else if (scenename == "cornell_box") {
 		cornellboxCamera();
+	}
+	else {
+		defaultCamera();
 	}
 }
 Camera::Camera(std::string type_, glm::vec3 eye_, glm::vec3 lookat_, glm::vec3 up_,
@@ -64,5 +67,16 @@ void Camera::veachmisCamera() {
 		27.3909,
 		1200,
 		900
+	);
+}
+void Camera::defaultCamera() {
+	new (this) Camera(
+		"perspective",
+		glm::vec3(0.0, 0.0, 6.0),
+		glm::vec3(0.0, 0, 0),
+		glm::vec3(0.0, 1, 0),
+		45,
+		800,
+		600
 	);
 }

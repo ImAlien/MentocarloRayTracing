@@ -134,6 +134,7 @@
     <ClInclude Include="obj\Obj.h" />
     <ClInclude Include="ray\IntersectResult.h" />
     <ClInclude Include="ray\Ray.h" />
+    <ClInclude Include="scene\scene.h" />
     <ClInclude Include="shape\Shape.h" />
   </ItemGroup>
   <ItemGroup>

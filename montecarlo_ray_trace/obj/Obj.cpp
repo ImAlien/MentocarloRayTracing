@@ -48,25 +48,25 @@ void Obj::loadFile(string filename) {
 			// Loop over vertices in the face.
 			for (size_t v = 0; v < fv; v++) {
 				// access to vertex
-				Point* p = new Point();
+				Point p;
 				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
 				double vx = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
 				double vy = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
 				double vz = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
-				p->pos = glm::vec3(vx, vy, vz);
+				p.pos = glm::vec3(vx, vy, vz);
 				// Check if `normal_index` is zero or positive. negative = no normal data
 				if (idx.normal_index >= 0) {
 					tinyobj::real_t nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
 					tinyobj::real_t ny = attrib.normals[3 * size_t(idx.normal_index) + 1];
 					tinyobj::real_t nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
-					p->normal = glm::vec3(nx, ny, nz);
+					p.normal = glm::vec3(nx, ny, nz);
 				}
 
 				// Check if `texcoord_index` is zero or positive. negative = no texcoord data
 				if (idx.texcoord_index >= 0) {
 					tinyobj::real_t tx = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
 					tinyobj::real_t ty = attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
-					p->tex = glm::vec2(tx, ty);
+					p.tex = glm::vec2(tx, ty);
 				}
 				cur_face->points.push_back(p);
 				// Optional: vertex colors

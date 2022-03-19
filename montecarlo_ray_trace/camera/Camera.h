@@ -18,5 +18,6 @@ public:
 	void bedroomCamera();
 	void cornellboxCamera();
 	void veachmisCamera();
+	void defaultCamera();
 	void saveImage(DataFrame* df);
 };

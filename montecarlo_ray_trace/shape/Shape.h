@@ -15,11 +15,11 @@ public:
 };
 class Shape {
 public:
-	std::vector<Point*> points;
+	std::vector<Point> points;
 	Material* material;
 	Shape() {};
-	virtual IntersectResult intersect(Ray ray) {
-		return IntersectResult();
+	virtual IntersectResult* intersect(Ray* ray) {
+		return new IntersectResult();
 	}
 };
 // 三角形
@@ -33,5 +33,5 @@ public:
 		p1 = P1, p2 = P2, p3 = P3;
 	}
 	// 与光线求交
-	IntersectResult intersect(Ray ray);
+	IntersectResult* intersect(Ray* ray);
 };

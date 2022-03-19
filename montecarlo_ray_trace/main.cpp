@@ -24,7 +24,7 @@ int main(void) {
 	GOBJ = new Obj();
 	//GOBJ->loadFile("./scenes/bedroom/bedroom.obj");
 	GCamera = new Camera("bedroom");
-	cout << GCamera->width << "  " << GCamera->height << endl;
+	//cout << GCamera->width << "  " << GCamera->height << endl;
 	system("pause");                        
 	return 0;
 }
