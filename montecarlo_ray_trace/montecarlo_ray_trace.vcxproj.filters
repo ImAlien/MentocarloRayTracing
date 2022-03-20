@@ -45,6 +45,9 @@
     <ClCompile Include="test\Log.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ray\IntersectResult.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\tiny_obj_loader.h">

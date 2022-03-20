@@ -1,2 +1,9 @@
-﻿  scene.cpp
+﻿  BVH.cpp
+  BoundingBox.cpp
+  main.cpp
+  Obj.cpp
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\obj\obj.cpp(43): warning C4018: “<”: 有符号/无符号不匹配
+  scene.cpp
+  Trangle.cpp
+  正在生成代码...
   montecarlo_ray_trace.vcxproj -> D:\course\CG\montecarlo_ray_trace\Debug\montecarlo_ray_trace.exe

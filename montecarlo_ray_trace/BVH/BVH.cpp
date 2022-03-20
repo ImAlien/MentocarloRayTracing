@@ -58,3 +58,27 @@ BVHnode* BVH::build(vector<BoundingBox>& BBs, int l, int r) {
 
 	return node;
 }
+
+IntersectResult BVH::intersectBVH(Ray& ray) {
+	return intersectBVHnode(root, ray);
+}
+IntersectResult BVH::intersectBVHnode(BVHnode* u, Ray& ray) {
+	IntersectResult res;
+	if (u->isLeaf) return u->BB.source->intersect(ray);
+	if (u->BB.intersectBB(ray) == false) return res;
+	IntersectResult res_left = intersectBVHnode(u->left, ray);
+	IntersectResult res_right = intersectBVHnode(u->right, ray);
+	if (res_left.isIntersect) {
+		res.isIntersect = true;
+		res.distance = std::min(res.distance, res_left.distance);
+		res.triangle = res_left.triangle;
+	}
+	if (res_right.isIntersect) {
+		res.isIntersect = true;
+		if (res.distance < res_right.distance) {
+			res.distance = res_right.distance;
+			res.triangle = res_right.triangle;
+		}
+	}
+	return res;
+}

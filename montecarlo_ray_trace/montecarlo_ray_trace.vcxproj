@@ -125,6 +125,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="material\Material.cpp" />
     <ClCompile Include="obj\Obj.cpp" />
+    <ClCompile Include="ray\IntersectResult.cpp" />
     <ClCompile Include="scene\scene.cpp" />
     <ClCompile Include="shape\Trangle.cpp" />
     <ClCompile Include="test\Log.cpp" />

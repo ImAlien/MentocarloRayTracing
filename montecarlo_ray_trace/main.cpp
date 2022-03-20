@@ -9,6 +9,7 @@
 #include"obj/Obj.h"
 #include"scene/scene.h"
 #include"test/Log.h"
+#include "main.h"
 #include<vector>
 #include<iostream>
 #include<stdio.h>
@@ -27,8 +28,7 @@ int main(void) {
 	//GOBJ->loadFile("./scenes/bunny/bunny.obj");
 	LOG("---------------------new main----------------------");
 	GScene = new Scene("bunny");
-	GCamera = new Camera();
-	//cout << GCamera->width << "  " << GCamera->height << endl;
+	
 	system("pause");                        
 	return 0;
 }
