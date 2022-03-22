@@ -4,6 +4,7 @@
 //#define TINYOBJLOADER_USE_MAPBOX_EARCUT
 #include "Obj.h"
 #include "../include/tiny_obj_loader.h"
+#include "../test/Log.h"
 #include <iostream>
 #include<glm/glm.hpp>
 using namespace std;
@@ -29,7 +30,7 @@ void Obj::loadFile(string filename) {
 	if (!reader.Warning().empty()) {
 		cout << "TinyObjReader: " << reader.Warning();
 	}
-
+	LOG("加载" + filename + "模型中...");
 	auto& attrib = reader.GetAttrib();
 	auto& shapes = reader.GetShapes();
 	auto& materials = reader.GetMaterials();
@@ -83,9 +84,8 @@ void Obj::loadFile(string filename) {
 		}
 	}
 
-	cout << nface <<"个面片加载完成" << endl;
+	LOG(to_string(nface) +"个面片加载完成");
 	createTriangles();
-	cout << "三角形面片加载完成" << endl;
 	//cout << "load success" << endl;
 }
 

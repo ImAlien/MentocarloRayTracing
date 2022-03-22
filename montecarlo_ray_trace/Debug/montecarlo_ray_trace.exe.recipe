@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\github\CG_project\Debug\montecarlo_ray_trace.exe</FullPath>
+      <FullPath>D:\github\CG\CG_project\Debug\montecarlo_ray_trace.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

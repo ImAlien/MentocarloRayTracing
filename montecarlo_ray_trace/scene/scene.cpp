@@ -1,6 +1,7 @@
 
 #include"scene.h"
 #include"../test/Log.h"
+#include <omp.h>    // openmp多线程加速
 
 using namespace std;
 using namespace glm;
@@ -31,17 +32,23 @@ void Scene::shade() {
 	
 	float zpos = 1.0 / tan(theta);
 	int idx = 0;
+
+	//omp_set_num_threads(50); // 线程个数
+	//#pragma omp parallel for
 	for (int i = 0; i < h; i++) {
+		if (i % 10 == 0) {
+			LOG("渲染第" + to_string(i) + "行像素中....");
+		}
 		for (int j = 0; j < w; j++) {
 			// Screen space to NDC space
 			float nx = (i + 0.5f) * 2 / w - 1.0f;
 			float ny = (j + 0.5f) * 2 / h - 1.0f;
 			// NDC space to world space
 			vec3 c_dir = vec3(nx, ny, -zpos);
-			vec3 lookat_dir = normalize(camera->lookat - camera->eye);
+			vec3 lookat_dir = -normalize(camera->lookat - camera->eye);
 			vec3 up_dir = normalize(camera->up);
 			vec3 x_dir = normalize(cross(lookat_dir, up_dir));
-			vec3 world_dir = nx * x_dir + ny * lookat_dir - zpos * up_dir;
+			vec3 world_dir = nx * x_dir + ny * up_dir - zpos * lookat_dir;
 			
 			Ray ray;
 			ray.direction = world_dir;

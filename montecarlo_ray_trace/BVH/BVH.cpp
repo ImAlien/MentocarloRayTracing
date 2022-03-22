@@ -10,9 +10,11 @@ using namespace glm;
 BVH::BVH(vector<BoundingBox>& BBs) {
 	LOG("开始创建BVH");
 	root = build(BBs, 0, BBs.size() - 1);
+	cout << root->BB.aa.x << root->BB.bb.x; 
 	LOG("BVH创建完成");
 }
 
+int CNT = 0;
 BVHnode* BVH::build(vector<BoundingBox>& BBs, int l, int r) {
 	if (l > r) return nullptr;
 
@@ -53,6 +55,8 @@ BVHnode* BVH::build(vector<BoundingBox>& BBs, int l, int r) {
 
 	// 递归
 	int mid = (l + r) / 2;
+	if(CNT ++ < 20)
+	cout << "左子树" << mid - l + 1 << "   " << "右子树" << r - mid << endl;
 	node->left = build(BBs, l, mid);
 	node->right = build(BBs, mid + 1, r);
 
@@ -64,6 +68,7 @@ IntersectResult BVH::intersectBVH(Ray& ray) {
 }
 IntersectResult BVH::intersectBVHnode(BVHnode* u, Ray& ray) {
 	IntersectResult res;
+	if (u == nullptr) return res;
 	if (u->isLeaf) return u->BB.source->intersect(ray);
 	if (u->BB.intersectBB(ray) == false) return res;
 	IntersectResult res_left = intersectBVHnode(u->left, ray);
