@@ -41,8 +41,8 @@ void Scene::shade() {
 		}
 		for (int j = 0; j < w; j++) {
 			// Screen space to NDC space
-			float nx = (i + 0.5f) * 2 / w - 1.0f;
-			float ny = (j + 0.5f) * 2 / h - 1.0f;
+			float ny = 1.0f - (i + 0.5f) * 2 / h ;
+			float nx = 1.0f - (j + 0.5f) * 2 / w ;
 			// NDC space to world space
 			vec3 c_dir = vec3(nx, ny, -zpos);
 			vec3 lookat_dir = -normalize(camera->lookat - camera->eye);

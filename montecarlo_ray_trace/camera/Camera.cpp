@@ -75,7 +75,7 @@ void Camera::veachmisCamera() {
 void Camera::defaultCamera() {
 	new (this) Camera(
 		"perspective",
-		glm::vec3(0.0, 0.0, 6.0),
+		glm::vec3(0.0, 0.0, 3.0),
 		glm::vec3(0.0, 0, 0),
 		glm::vec3(0.0, 1, 0),
 		45,

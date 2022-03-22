@@ -1,2 +1,5 @@
-﻿  BVH.cpp
-  montecarlo_ray_trace.vcxproj -> D:\github\CG\CG_project\Debug\montecarlo_ray_trace.exe
+﻿  scene.cpp
+c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(31): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(33): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+  montecarlo_ray_trace.vcxproj -> D:\course\CG\montecarlo_ray_trace\Debug\montecarlo_ray_trace.exe
