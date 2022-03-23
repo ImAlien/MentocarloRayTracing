@@ -1,5 +1,19 @@
-﻿  scene.cpp
+﻿  BVH.cpp
+c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
+  BoundingBox.cpp
+c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
+  main.cpp
+c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
+  Material.cpp
+c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
+  Obj.cpp
+c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\obj\obj.cpp(44): warning C4018: “<”: 有符号/无符号不匹配
+  scene.cpp
 c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
 d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(31): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
 d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(33): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+  Trangle.cpp
+c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
+  正在生成代码...
   montecarlo_ray_trace.vcxproj -> D:\course\CG\montecarlo_ray_trace\Debug\montecarlo_ray_trace.exe

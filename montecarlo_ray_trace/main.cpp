@@ -27,7 +27,7 @@ int main(void) {
 	//GOBJ = new Obj();
 	//GOBJ->loadFile("./scenes/bunny/bunny.obj");
 	LOG("---------------------new main----------------------");
-	GScene = new Scene("bunny");
+	GScene = new Scene(SCENE_NAME);
 	
 	system("pause");                        
 	return 0;

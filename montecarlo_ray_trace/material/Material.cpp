@@ -15,3 +15,6 @@ Material::Material(tinyobj::material_t mt) {
 Material::Material() {
 	this->Ka = glm::vec3(0, 0, 0);
 }
+bool Material::isLight() {
+	return name == "Light";
+}

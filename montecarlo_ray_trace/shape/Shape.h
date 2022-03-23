@@ -17,7 +17,7 @@ public:
 class Shape {
 public:
 	std::vector<Point> points;
-	Material* material;
+	Material material;
 	Shape() {};
 	virtual IntersectResult intersect(Ray& ray) {
 		IntersectResult res;

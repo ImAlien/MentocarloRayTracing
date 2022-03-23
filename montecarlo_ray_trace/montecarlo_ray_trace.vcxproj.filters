@@ -48,6 +48,9 @@
     <ClCompile Include="ray\IntersectResult.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="sample\sample.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\tiny_obj_loader.h">
@@ -87,6 +90,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="test\Log.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sample\sample.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

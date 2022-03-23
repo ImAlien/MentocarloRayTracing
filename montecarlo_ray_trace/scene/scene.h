@@ -8,7 +8,7 @@
 #include<vector>
 #include<string>
 #include"../ray/Ray.h"
-
+#include "../main.h"
 class Scene {
 public:
 
@@ -21,5 +21,6 @@ public:
 	Scene();
 	void createBoundingBox();
 	void shade();
-	glm::vec3 rayCasting(Ray& ray, int depth);
+	glm::dvec3 raysCasting(Ray& ray, int depth);
+	glm::dvec3 rayCasting(Ray& ray, int depth);
 };

@@ -18,10 +18,10 @@ Camera::Camera(string scenename) {
 	if (scenename == "bedroom") {
 		bedroomCamera();
 	}
-	else if (scenename == "veach_mis") {
+	else if (scenename == "veach-mis") {
 		veachmisCamera();
 	}
-	else if (scenename == "cornell_box") {
+	else if (scenename == "cornell-box") {
 		cornellboxCamera();
 	}
 	else {

@@ -127,6 +127,7 @@
     <ClCompile Include="material\Material.cpp" />
     <ClCompile Include="obj\Obj.cpp" />
     <ClCompile Include="ray\IntersectResult.cpp" />
+    <ClCompile Include="sample\sample.cpp" />
     <ClCompile Include="scene\scene.cpp" />
     <ClCompile Include="shape\Trangle.cpp" />
     <ClCompile Include="test\Log.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="obj\Obj.h" />
     <ClInclude Include="ray\IntersectResult.h" />
     <ClInclude Include="ray\Ray.h" />
+    <ClInclude Include="sample\sample.h" />
     <ClInclude Include="scene\scene.h" />
     <ClInclude Include="shape\Shape.h" />
     <ClInclude Include="test\Log.h" />

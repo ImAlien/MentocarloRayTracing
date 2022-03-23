@@ -1,6 +1,7 @@
 
 #include"scene.h"
 #include"../test/Log.h"
+#include <glm/gtx/vector_angle.hpp>
 #include <omp.h>    // openmp多线程加速
 
 using namespace std;
@@ -28,17 +29,14 @@ void Scene::createBoundingBox() {
 void Scene::shade() {
 	LOG("开始渲染");
 	int w = camera->width, h = camera->height;
-	float theta = camera->fovy / 2;
+	float theta = camera->fovy/2;
 	
 	float zpos = 1.0 / tan(theta);
 	int idx = 0;
 
-	//omp_set_num_threads(50); // 线程个数
-	//#pragma omp parallel for
+	omp_set_num_threads(20); // 线程个数
+	#pragma omp parallel for
 	for (int i = 0; i < h; i++) {
-		if (i % 10 == 0) {
-			LOG("渲染第" + to_string(i) + "行像素中....");
-		}
 		for (int j = 0; j < w; j++) {
 			// Screen space to NDC space
 			float ny = 1.0f - (i + 0.5f) * 2 / h ;
@@ -54,7 +52,7 @@ void Scene::shade() {
 			ray.direction = world_dir;
 			ray.startPoint = camera->eye;
 			
-			vec3 color = rayCasting(ray, 0);
+			dvec3 color = raysCasting(ray, 0);
 			df->data[idx++] = color.x;
 			df->data[idx++] = color.y;
 			df->data[idx++] = color.z;
@@ -62,8 +60,26 @@ void Scene::shade() {
 	}
 	LOG("渲染完成");
 }
-vec3 Scene::rayCasting(Ray& ray, int depth) {
-	if(bvh->intersectBVH(ray).isIntersect)
-		return vec3(1, 0, 0);
-	return vec3(0, 0, 0);
+dvec3 Scene::raysCasting(Ray& ray, int depth) {
+	dvec3 hitColor = dvec3(0, 0, 0);
+	for (int i = 0; i < SPP; i++) {
+		hitColor += rayCasting(ray, depth);
+	}
+	hitColor /= SPP;
+	return hitColor;
+}
+dvec3 Scene::rayCasting(Ray& ray, int depth) {	
+	dvec3 hitColor =  dvec3(0, 0, 0);
+	IntersectResult hit_res = bvh->intersectBVH(ray);
+	if (hit_res.isIntersect) {
+		Triangle* tr = hit_res.triangle;
+		Material &m = hit_res.triangle->material;
+		vec3 N = hit_res.triangle->normal;
+		vec3 p = hit_res.intersectPoint;
+		float alpha = angle(ray.direction, N);
+		float c = fabs(cos(alpha));
+		vec3 t = vec3(c, c, c);
+		return t;
+	}
+	return hitColor;
 }

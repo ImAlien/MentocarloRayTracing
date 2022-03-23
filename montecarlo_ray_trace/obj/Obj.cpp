@@ -79,7 +79,7 @@ void Obj::loadFile(string filename) {
 			// per-face material
 			int mtl_id = shapes[s].mesh.material_ids[f];
 			if(mtl_id >= 0)
-				cur_face->material = new Material(materials[mtl_id]);
+				cur_face->material = Material(materials[mtl_id]);
 			faces.push_back(cur_face);
 		}
 	}

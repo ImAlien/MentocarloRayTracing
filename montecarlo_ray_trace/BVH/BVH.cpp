@@ -80,10 +80,14 @@ IntersectResult BVH::intersectBVHnode(BVHnode* u, Ray& ray) {
 	}
 	if (res_right.isIntersect) {
 		res.isIntersect = true;
-		if (res.distance < res_right.distance) {
+		if (res.distance > res_right.distance) {
 			res.distance = res_right.distance;
 			res.triangle = res_right.triangle;
 		}
+	}
+	if (res.isIntersect && res.triangle == nullptr) {
+		LOG("ERROR : intersect but no intersectionshape");
+		exit(1);
 	}
 	return res;
 }
