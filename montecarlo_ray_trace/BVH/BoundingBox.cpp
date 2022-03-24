@@ -15,7 +15,7 @@ BoundingBox::BoundingBox(glm::vec3 p1, glm::vec3 p2) {
 	aa = p1;
 	bb = p2;
 }
-bool BoundingBox::intersectBB(Ray& r) {
+float BoundingBox::intersectBB(Ray& r) {
 	// 1.0 / direction
 	glm::vec3 invdir = glm::vec3(1.0 / r.direction.x, 1.0 / r.direction.y, 1.0 / r.direction.z);
 
@@ -28,7 +28,7 @@ bool BoundingBox::intersectBB(Ray& r) {
 	float t1 = min(tmax.x, min(tmax.y, tmax.z));
 	float t0 = max(tmin.x, max(tmin.y, tmin.z));
 
-	return (t1 >= t0) ? true: false;
+	return (t1 >= t0) ? min(t1, t0): -1;
 }
 bool cmpBBx(const BoundingBox &a, const BoundingBox &b) {
 	return a.aa.x < b.aa.x;

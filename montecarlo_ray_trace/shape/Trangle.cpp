@@ -23,13 +23,13 @@ IntersectResult Triangle::intersect(Ray& ray) {
 	vec3 c1 = cross(p2 - p1, P - p1);
 	vec3 c2 = cross(p3 - p2, P - p2);
 	vec3 c3 = cross(p1 - p3, P - p3);
-	if (dot(c1, N) > 0 && dot(c2, N) > 0 && dot(c3, N) > 0) {
+	if (dot(c1, N) >= 0 && dot(c2, N) >= 0 && dot(c3, N) >= 0) {
 		res.distance = t;
 		res.isIntersect = true;
 		res.triangle = this;
 		return res;
 	}
-	if (dot(c1, N) < 0 && dot(c2, N) < 0 && dot(c3, N) < 0) {
+	if (dot(c1, N) <= 0 && dot(c2, N) <= 0 && dot(c3, N) <= 0) {
 		res.distance = t;
 		res.isIntersect = true;
 		res.triangle = this;
@@ -37,4 +37,21 @@ IntersectResult Triangle::intersect(Ray& ray) {
 	}
 
 	return res;
+}
+Triangle::Triangle(Shape* s) {
+	this->material = s->material;
+	p1 = s->points[0].pos;
+	p2 = s->points[1].pos;
+	p3 = s->points[2].pos;
+	n1 = s->points[0].normal;
+	n2 = s->points[1].normal;
+	n3 = s->points[2].normal;
+	tex1 = s->points[0].tex;
+	tex2 = s->points[1].tex;
+	tex3 = s->points[2].tex;
+	normal = glm::normalize(glm::cross(p2 - p1, p3 - p2));
+}
+vec3 Triangle::getKd() {
+	if (this->material.diffuse_texname == "") return material.Kd;
+	
 }

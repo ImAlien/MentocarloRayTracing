@@ -10,7 +10,7 @@ public:
 	BoundingBox() {};
 	BoundingBox(Triangle* tr);
 	BoundingBox(glm::vec3 p1, glm::vec3 p2);
-	bool intersectBB(Ray& ray);
+	float intersectBB(Ray& ray);
 };
 
 bool cmpBBx(const BoundingBox &a, const BoundingBox &b);

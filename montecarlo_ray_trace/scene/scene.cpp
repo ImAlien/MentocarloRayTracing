@@ -39,8 +39,10 @@ void Scene::shade() {
 	for (int i = 0; i < h; i++) {
 		for (int j = 0; j < w; j++) {
 			// Screen space to NDC space
-			float ny = 1.0f - (i + 0.5f) * 2 / h ;
-			float nx = 1.0f - (j + 0.5f) * 2 / w ;
+			//float ny = 1.0f - (i + 0.5f) * 2 / h ;
+			//float nx = 1.0f - (j + 0.5f) * 2 / w ;
+			float nx = (j - w * 1.0 / 2) / w;
+			float ny = (h / 2 - i)*1.0 / h;
 			// NDC space to world space
 			vec3 c_dir = vec3(nx, ny, -zpos);
 			vec3 lookat_dir = -normalize(camera->lookat - camera->eye);
@@ -74,12 +76,12 @@ dvec3 Scene::rayCasting(Ray& ray, int depth) {
 	if (hit_res.isIntersect) {
 		Triangle* tr = hit_res.triangle;
 		Material &m = hit_res.triangle->material;
-		vec3 N = hit_res.triangle->normal;
-		vec3 p = hit_res.intersectPoint;
-		float alpha = angle(ray.direction, N);
-		float c = fabs(cos(alpha));
-		vec3 t = vec3(c, c, c);
-		return t;
+		if (m.isLight()) return vec3(17, 12, 4);
+		vec3 N = tr->normal;
+		vec3 L = normalize(ray.direction);
+		dvec3 returnc = m.Kd * fabs(dot(N, L))*vec3(17,12,4);
+		returnc /= PI;
+		return returnc;
 	}
 	return hitColor;
 }

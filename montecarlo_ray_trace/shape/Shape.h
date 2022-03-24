@@ -29,13 +29,12 @@ class Triangle : public Shape
 {
 public:
 	glm::vec3 p1, p2, p3;    // Èý¶¥µã
+	glm::vec3 n1, n2, n3;
+	glm::vec2 tex1, tex2, tex3;
 	glm::vec3 normal;
 	Triangle() {}
-	Triangle(glm::vec3 P1, glm::vec3 P2, glm::vec3 P3)
-	{
-		p1 = P1, p2 = P2, p3 = P3;
-		normal = glm::normalize(glm::cross(p2 - p1, p3 - p2));
-	}
+	Triangle(Shape* s);
 	IntersectResult intersect(Ray& ray);
+	glm::vec3 getKd();
 };
 

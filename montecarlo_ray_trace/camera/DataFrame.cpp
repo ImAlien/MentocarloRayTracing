@@ -1,8 +1,10 @@
 #include"DataFrame.h"
 #include<iostream>
 #include<glm/glm.hpp>
+#include<fstream>
 
 using namespace std;
+using namespace glm;
 DataFrame::DataFrame(int w, int h) {
 	this->HEIGHT = h;
 	this->WIDTH = w;
@@ -22,4 +24,17 @@ void DataFrame::inputImage() {
 			*p++ = (unsigned char)glm::clamp((*S++) * 255, 0.0, 255.0);  // B 通道
 		}
 	}
+}
+void DataFrame::load(string file) {
+	// 1. 打开图片文件
+	ifstream is(file, ifstream::in | ios::binary);
+	// 2. 计算图片长度
+	is.seekg(0, is.end);  //将文件流指针定位到流的末尾
+	int length = is.tellg();
+	is.seekg(0, is.beg);  //将文件流指针重新定位到流的开始
+	// 3. 创建内存缓存区
+	buffer = new char[length];
+	// 4. 读取图片
+	is.read(buffer, length);
+	is.close();
 }

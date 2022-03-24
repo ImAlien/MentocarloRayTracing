@@ -19,5 +19,5 @@ public:
 	BVH(std::vector<BoundingBox>& BBs);
 	BVHnode* build(std::vector<BoundingBox>& BBs, int l, int r);
 	IntersectResult intersectBVH(Ray& ray);
-	IntersectResult intersectBVHnode(BVHnode* u, Ray& ray);
+	IntersectResult intersectBVHnode(BVHnode* u, Ray& ray,float tmin);
 };

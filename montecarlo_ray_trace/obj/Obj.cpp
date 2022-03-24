@@ -79,7 +79,7 @@ void Obj::loadFile(string filename) {
 			// per-face material
 			int mtl_id = shapes[s].mesh.material_ids[f];
 			if(mtl_id >= 0)
-				cur_face->material = Material(materials[mtl_id]);
+				cur_face->material.set(materials[mtl_id]);
 			faces.push_back(cur_face);
 		}
 	}
@@ -91,7 +91,6 @@ void Obj::loadFile(string filename) {
 
 void Obj::createTriangles() {
 	for (Shape* shape : faces) {
-		triangles.push_back(new Triangle(shape->points[0].pos, shape->points[1].pos, 
-			shape->points[2].pos));
+		triangles.push_back(new Triangle(shape));
 	}
 }
