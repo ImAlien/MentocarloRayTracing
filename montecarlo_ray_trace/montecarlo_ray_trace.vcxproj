@@ -123,10 +123,12 @@
     <ClCompile Include="BVH\BVH.cpp" />
     <ClCompile Include="camera\Camera.cpp" />
     <ClCompile Include="camera\DataFrame.cpp" />
+    <ClCompile Include="Light\Light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="material\Material.cpp" />
     <ClCompile Include="obj\Obj.cpp" />
     <ClCompile Include="ray\IntersectResult.cpp" />
+    <ClCompile Include="ray\Ray.cpp" />
     <ClCompile Include="sample\sample.cpp" />
     <ClCompile Include="scene\scene.cpp" />
     <ClCompile Include="shape\Trangle.cpp" />
@@ -138,6 +140,7 @@
     <ClInclude Include="camera\Camera.h" />
     <ClInclude Include="camera\DataFrame.h" />
     <ClInclude Include="include\tiny_obj_loader.h" />
+    <ClInclude Include="Light\Light.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="material\Material.h" />
     <ClInclude Include="obj\Obj.h" />

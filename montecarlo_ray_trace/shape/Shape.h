@@ -36,5 +36,6 @@ public:
 	Triangle(Shape* s);
 	IntersectResult intersect(Ray& ray);
 	glm::vec3 getKd();
+	glm::vec3 getIntensity();
 };
 

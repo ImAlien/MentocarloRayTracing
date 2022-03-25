@@ -1,5 +1,6 @@
 
 #include"Material.h"
+#include "../main.h"
 
 using namespace glm;
 
@@ -31,4 +32,10 @@ Material::Material() {
 }
 bool Material::isLight() {
 	return name == "Light";
+}
+
+vec3 Material::BRDF(Ray& ray) {
+	vec3 res = Kd;
+	res /= PI;
+	return res;
 }

@@ -1,4 +1,5 @@
 #include "Shape.h"
+#include "../main.h"
 
 using namespace glm;
 IntersectResult Triangle::intersect(Ray& ray) {
@@ -27,12 +28,14 @@ IntersectResult Triangle::intersect(Ray& ray) {
 		res.distance = t;
 		res.isIntersect = true;
 		res.triangle = this;
+		res.intersectPoint = P;
 		return res;
 	}
 	if (dot(c1, N) <= 0 && dot(c2, N) <= 0 && dot(c3, N) <= 0) {
 		res.distance = t;
 		res.isIntersect = true;
 		res.triangle = this;
+		res.intersectPoint = P;
 		return res;
 	}
 
@@ -54,4 +57,9 @@ Triangle::Triangle(Shape* s) {
 vec3 Triangle::getKd() {
 	if (this->material.diffuse_texname == "") return material.Kd;
 	
+}
+vec3 Triangle::getIntensity() {
+	if (SCENE_NAME == "cornell-box") {
+		return vec3(17, 12, 4);
+	}
 }
