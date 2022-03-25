@@ -25,6 +25,7 @@ public:
 	void shade();
 	glm::dvec3 raysCasting(Ray& ray);
 	glm::dvec3 rayCasting(Ray& ray);
+	void initMaterial();
 };
 
 void gamma(glm::dvec3& color);

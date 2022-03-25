@@ -27,5 +27,4 @@ public:
 		cout << "Kd:  " << m.Kd.x << ' ' << m.Kd.y << ' '<< m.Kd.z << std::endl;
 		return cout;
 	}
-	
 };

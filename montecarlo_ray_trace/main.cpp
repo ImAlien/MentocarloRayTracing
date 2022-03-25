@@ -13,6 +13,8 @@
 #include<vector>
 #include<iostream>
 #include<stdio.h>
+#include<opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 using namespace std;
 using namespace glm;
@@ -28,7 +30,6 @@ int main(void) {
 	//GOBJ->loadFile("./scenes/bunny/bunny.obj");
 	LOG("---------------------new main----------------------");
 	GScene = new Scene(SCENE_NAME);
-	
 	system("pause");                        
 	return 0;
 }

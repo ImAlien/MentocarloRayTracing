@@ -4,7 +4,9 @@
 #include <glm/gtx/vector_angle.hpp>
 #include <omp.h>    // openmp多线程加速
 #include <stdlib.h>
-
+#include <opencv2/core/core.hpp>
+#include<opencv2/highgui/highgui.hpp>
+#include<map>
 using namespace std;
 using namespace glm;
 bool flag = true;
@@ -15,6 +17,7 @@ Scene::Scene(string name) {
 	string pathname = "./scenes/" + name + "/" + name + ".obj";
 	obj = new Obj(pathname);
 	parseFromObj();
+	initMaterial();
 	this->bvh = new BVH(BBs);
 	this->df = new DataFrame(camera->width, camera->height);
 	shade();
@@ -38,9 +41,8 @@ void Scene::shade() {
 	float theta = camera->fovy/2;
 	
 	float zpos = 1.0 / tan(theta);
-	int idx = 0;
 
-	omp_set_num_threads(20); // 线程个数
+	omp_set_num_threads(10); // 线程个数
 	#pragma omp parallel for
 	for (int i = 0; i < h; i++) {
 		for (int j = 0; j < w; j++) {
@@ -62,11 +64,11 @@ void Scene::shade() {
 			
 			dvec3 color = raysCasting(ray);
 			gamma(color);
-			df->data[idx++] = color.x;
-			df->data[idx++] = color.y;
-			df->data[idx++] = color.z;
+			int pos = (i*w + j) * 3;
+			df->data[pos] = color.x;
+			df->data[pos + 1] = color.y;
+			df->data[pos + 2] = color.z;
 		}
-		LOG("第" + to_string(i) + "行完成");
 	}
 	LOG("渲染完成");
 }
@@ -120,6 +122,44 @@ dvec3 Scene::rayCasting(Ray& ray) {
 		}
 	}
 	return L_dir + L_indir;
+}
+void Scene::initMaterial() {
+	cv::Mat image;
+	map<string, vector<Triangle*>> mapKd;
+	for (Triangle* tr : obj->triangles) {
+		if (tr->material.diffuse_texname != "") {
+			mapKd[tr->material.diffuse_texname].push_back(tr);
+		}
+	}
+	for (auto& m : mapKd) {
+		string name = m.first;
+		vector<Triangle*> trs = m.second;
+		string filename = SCENE_PATH + string(SCENE_NAME) + "/" + name;
+		image = cv::imread(filename);
+		if (image.data == nullptr)//nullptr是c++11新出现的空指针常量
+		{
+			cerr << "图片文件不存在" << endl;
+			exit(1);
+		}
+		for (Triangle* tr : trs) {
+			float x = tr->tex1.x - (int)tr->tex1.x;
+			float y = tr->tex1.y - (int)tr->tex1.y;
+			int pic_x = image.rows * y;
+			int pic_y = image.cols * x;
+			//输出图片的基本信息
+			int intb = image.at<cv::Vec3b>(pic_x, pic_y)[0];
+			int intg = image.at<cv::Vec3b>(pic_x, pic_y)[1];
+			int intr = image.at<cv::Vec3b>(pic_x, pic_y)[2];
+			float b = intb * 1.0 / 255;
+			float g = intg * 1.0 / 255;
+			float r = intr * 1.0 / 255;
+			b = powf(b, 2.2);
+			g = powf(g, 2.2);
+			r = powf(r, 2.2);
+			tr->material.Kd = vec3(r, g ,b);
+			
+		}
+	}
 }
 void gamma(dvec3& color) {
 	color.x = powf(color.x, 1.0 / 2.2);

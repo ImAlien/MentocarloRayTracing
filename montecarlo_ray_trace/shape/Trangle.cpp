@@ -1,6 +1,7 @@
 #include "Shape.h"
 #include "../main.h"
 
+using namespace std;
 using namespace glm;
 IntersectResult Triangle::intersect(Ray& ray) {
 	IntersectResult res;
