@@ -12,6 +12,7 @@ public:
 	glm::vec3 Kd;
 	glm::vec3 Ks;
 	double Ni, Ns;
+	bool isTex = false;
 	std::string ambient_texname;             // map_Ka
 	std::string diffuse_texname;             // map_Kd
 	std::string specular_texname;            // map_Ks

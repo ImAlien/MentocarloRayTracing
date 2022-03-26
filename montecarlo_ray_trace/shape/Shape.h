@@ -5,6 +5,7 @@
 #include"../ray/Ray.h"
 #include"../material/Material.h"
 #include "../ray/IntersectResult.h"
+#include "../material/Texture.h"
 #include <vector>
 #include "../main.h"
 class Point {
@@ -37,5 +38,6 @@ public:
 	IntersectResult intersect(Ray& ray);
 	glm::vec3 getKd();
 	glm::vec3 getIntensity();
+	glm::vec3 getTex(glm::vec3 p, Texture* tex);
 };
 

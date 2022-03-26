@@ -11,6 +11,7 @@ Material::Material(tinyobj::material_t mt) {
 	this->name = mt.name;
 	this->ambient_texname = mt.ambient_texname;
 	this->diffuse_texname = mt.diffuse_texname;
+	if (diffuse_texname != "") isTex = true;
 	this->specular_texname = mt.specular_texname;
 	this->specular_highlight_texname = mt.specular_highlight_texname;
 	this->Ns = mt.shininess;
@@ -22,6 +23,7 @@ void Material::set(tinyobj::material_t mt) {
 	this->name = mt.name;
 	this->ambient_texname = mt.ambient_texname;
 	this->diffuse_texname = mt.diffuse_texname;
+	if (diffuse_texname != "") isTex = true;
 	this->specular_texname = mt.specular_texname;
 	this->specular_highlight_texname = mt.specular_highlight_texname;
 	this->Ns = mt.shininess;

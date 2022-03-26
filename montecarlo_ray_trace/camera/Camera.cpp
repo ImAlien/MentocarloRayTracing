@@ -8,6 +8,7 @@ using namespace std;
 void Camera::saveImage(DataFrame* df) {
 	FILE* fp;
 	fopen_s(&fp, "image.png", "wb");
+	//simpleProcess(df);
 	svpng(fp, df->WIDTH, df->HEIGHT, df->image, 0);
 	fclose(fp);
 }
@@ -82,4 +83,31 @@ void Camera::defaultCamera() {
 		800,
 		600
 	);
+}
+int getpos(int i, int j, int w, int c) {
+	return (i * w + j)*3 + c;
+}
+void Camera::simpleProcess(DataFrame* df) {
+	int w = df->WIDTH, h = df->HEIGHT;
+	int dx[] = { -1,-1, 0, 1, 1, 1, 0, -1 , 0};
+	int dy[] = { 0, -1, -1,-1, 0, 1, 1, 1 , 0};
+	for (int i = 0; i < h; i++) {
+		for (int j = 0; j < w; j++) {
+			for (int c = 0; c < 3; c++) {
+				int ans = 0;
+				int cnt = 0;
+				for (int k = 0; k < 9; k++) {
+					int x = dx[k] + i, y = dx[k] + j;
+					if (x >= 0 && x < h && y >= 0 && y < w) {
+						ans += df->image[getpos(x, y, w, c)];
+						cnt++;
+					}
+				}
+				ans /= cnt;
+				df->image[getpos(i, j, w, c)] = (unsigned char)ans;
+				}
+			
+			
+		}
+	}
 }

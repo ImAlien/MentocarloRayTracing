@@ -57,6 +57,9 @@
     <ClCompile Include="ray\Ray.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="material\Texture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\tiny_obj_loader.h">
@@ -102,6 +105,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Light\Light.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="material\Texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

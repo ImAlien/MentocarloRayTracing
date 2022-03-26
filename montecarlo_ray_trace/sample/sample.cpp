@@ -16,3 +16,6 @@ vec3 toNormalHemisphere(vec3 v, vec3 N) {
 	vec3 bitangent = normalize(cross(N, tangent));
 	return v.x * tangent + v.y * bitangent + v.z * N;
 }
+float randomf() {
+	return rand()*1.0 / RAND_MAX;
+}

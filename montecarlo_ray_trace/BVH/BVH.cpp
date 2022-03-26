@@ -69,7 +69,7 @@ IntersectResult BVH::intersectBVHnode(BVHnode* u, Ray& ray,float tmin, float tma
 	if (u == nullptr) return res;
 	if (u->isLeaf) return u->BB.source->intersect(ray);
 	float tcur = u->BB.intersectBB(ray);
-	if (tcur == -1 ) return res;
+	if (tcur == -1 || tcur >= tmax) return res;
 	IntersectResult res_left = intersectBVHnode(u->left, ray, tmin, tmax);
 	tmax = std::min(tmax, res_left.distance);
 	IntersectResult res_right = intersectBVHnode(u->right, ray,tmin, tmax);

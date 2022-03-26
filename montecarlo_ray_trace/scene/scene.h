@@ -10,6 +10,8 @@
 #include"../ray/Ray.h"
 #include "../main.h"
 #include "../Light/Light.h"
+#include "../material/Texture.h"
+#include <map>
 class Scene {
 public:
 
@@ -19,12 +21,13 @@ public:
 	Obj* obj;
 	BVH* bvh;
 	DataFrame* df;
+	std::map<std::string, Texture*> texmap;
 	Scene(std::string name);
 	Scene();
 	void parseFromObj();
 	void shade();
-	glm::dvec3 raysCasting(Ray& ray);
-	glm::dvec3 rayCasting(Ray& ray);
+	glm::dvec3 raysCasting(Ray& ray, int& i, int& j);
+	glm::dvec3 rayCasting(Ray& ray, int& i, int& j);
 	void initMaterial();
 };
 

@@ -1,6 +1,7 @@
 #include "Shape.h"
 #include "../main.h"
 
+
 using namespace std;
 using namespace glm;
 IntersectResult Triangle::intersect(Ray& ray) {
@@ -8,10 +9,9 @@ IntersectResult Triangle::intersect(Ray& ray) {
 
 	vec3 S = ray.startPoint;        // 射线起点
 	vec3 d = ray.direction;         // 射线方向
-	vec3 N = normalize(cross(p2 - p1, p3 - p1));    // 法向量
-	if (dot(N, d) > 0.0f) N = -N;   // 获取正确的法向量
+	vec3 N = normal;    // 法向量
 
-	// 如果视线和三角形平行
+	 // 如果视线和三角形平行
 	if (fabs(dot(N, d)) < 0.00001f) return res;
 
 	// 距离
@@ -63,4 +63,19 @@ vec3 Triangle::getIntensity() {
 	if (SCENE_NAME == "cornell-box") {
 		return vec3(17, 12, 4);
 	}
+}
+
+float Area(vec3 a, vec3 b, vec3 c) {
+	return sqrt(dot(cross(b - a, c - a), cross(b - a, c - a)));
+}
+glm::vec3 Triangle::getTex(glm::vec3 p, Texture* texMap) {
+	float A = Area(p1, p2, p3);
+	float alpha = Area(p, p2, p3) / A;
+	float beta = Area(p, p1, p3) / A;
+	float gama = 1 - alpha - beta;
+	float u = tex1.x * alpha + tex2.x*beta + tex3.x  * gama;
+	float v = tex1.y * alpha + tex2.y*beta + tex3.y * gama;
+	u -= (int)u;
+	v -= (int)v;
+	return texMap->get(u, v);
 }

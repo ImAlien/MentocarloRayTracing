@@ -21,4 +21,5 @@ public:
 	void veachmisCamera();
 	void defaultCamera();
 	void saveImage(DataFrame* df);
+	void simpleProcess(DataFrame* df);
 };
