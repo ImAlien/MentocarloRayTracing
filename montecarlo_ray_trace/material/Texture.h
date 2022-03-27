@@ -5,7 +5,7 @@
 class Texture {
 public:
 	int w, h;
-	std::vector<std::vector<glm::vec3>> tex;
+	glm::vec3 *tex;
 	Texture() {};
 	Texture(std::string filename);
 	glm::vec3 get(int i, int j);

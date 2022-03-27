@@ -7,39 +7,52 @@ using namespace glm;
 IntersectResult Triangle::intersect(Ray& ray) {
 	IntersectResult res;
 
-	vec3 S = ray.startPoint;        // 射线起点
-	vec3 d = ray.direction;         // 射线方向
-	vec3 N = normal;    // 法向量
+	vec3& O = ray.startPoint;        // 射线起点
+	vec3& D = ray.direction;         // 射线方向
+	vec3& N = normal;    // 法向量
 
 	 // 如果视线和三角形平行
-	if (fabs(dot(N, d)) < 0.00001f) return res;
+	if (fabs(dot(N, D)) < 0.00001f) return res;
 
-	// 距离
-	float t = (dot(N, p1) - dot(S, N)) / dot(d, N);
-	if (t < 0.0005f) return res;    // 如果三角形在光线背面
+	//// 距离
+	//float t = (dot(N, p1) - dot(S, N)) / dot(d, N);
+	//if (t < 0.0005f) return res;    // 如果三角形在光线背面
 
-	// 交点计算
-	vec3 P = S + d * t;
+	//// 交点计算
+	//vec3 P = S + d * t;
 
-	// 判断交点是否在三角形中
-	vec3 c1 = cross(p2 - p1, P - p1);
-	vec3 c2 = cross(p3 - p2, P - p2);
-	vec3 c3 = cross(p1 - p3, P - p3);
-	if (dot(c1, N) >= 0 && dot(c2, N) >= 0 && dot(c3, N) >= 0) {
+	//// 判断交点是否在三角形中
+	//vec3 c1 = cross(p2 - p1, P - p1);
+	//vec3 c2 = cross(p3 - p2, P - p2);
+	//vec3 c3 = cross(p1 - p3, P - p3);
+	//if (dot(c1, N) >= 0 && dot(c2, N) >= 0 && dot(c3, N) >= 0) {
+	//	res.distance = t;
+	//	res.isIntersect = true;
+	//	res.triangle = this;
+	//	res.intersectPoint = P;
+	//	return res;
+	//}
+	//if (dot(c1, N) <= 0 && dot(c2, N) <= 0 && dot(c3, N) <= 0) {
+	//	res.distance = t;
+	//	res.isIntersect = true;
+	//	res.triangle = this;
+	//	res.intersectPoint = P;
+	//	return res;
+	//}
+	vec3 E1 = p2 - p1, E2 = p3 - p1;
+	vec3 S = O - p1, S1 = cross(D, E2), S2 = cross(S, E1);
+	float deno = dot(S1, E1);
+	if (fabs(deno) < EPSILON) return res;
+	float t = dot(S2, E2) / deno;
+	float b1 = dot(S1, S) / deno;
+	float b2 = dot(S2, D) / deno;
+	if (t > EPSILON && b1 >= 0 && b2 >= 0 && (1 - b1 - b2) >= 0) {
 		res.distance = t;
-		res.isIntersect = true;
+		res.intersectPoint = O + t * D;
 		res.triangle = this;
-		res.intersectPoint = P;
+		res.isIntersect = true;
 		return res;
 	}
-	if (dot(c1, N) <= 0 && dot(c2, N) <= 0 && dot(c3, N) <= 0) {
-		res.distance = t;
-		res.isIntersect = true;
-		res.triangle = this;
-		res.intersectPoint = P;
-		return res;
-	}
-
 	return res;
 }
 Triangle::Triangle(Shape* s) {
@@ -60,9 +73,7 @@ vec3 Triangle::getKd() {
 	
 }
 vec3 Triangle::getIntensity() {
-	if (SCENE_NAME == "cornell-box") {
-		return vec3(17, 12, 4);
-	}
+	return this->material.getIntensity();
 }
 
 float Area(vec3 a, vec3 b, vec3 c) {
@@ -75,7 +86,7 @@ glm::vec3 Triangle::getTex(glm::vec3 p, Texture* texMap) {
 	float gama = 1 - alpha - beta;
 	float u = tex1.x * alpha + tex2.x*beta + tex3.x  * gama;
 	float v = tex1.y * alpha + tex2.y*beta + tex3.y * gama;
-	u -= (int)u;
-	v -= (int)v;
+	u = u - floor(u);
+	v = v - floor(v);
 	return texMap->get(u, v);
 }

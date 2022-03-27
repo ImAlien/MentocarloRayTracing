@@ -2,6 +2,8 @@
 #include"DataFrame.h"
 #include <glm/glm.hpp>
 #include <string>
+#include<iostream>
+#include"../test/Log.h"
 
 
 class Camera {
@@ -22,4 +24,8 @@ public:
 	void defaultCamera();
 	void saveImage(DataFrame* df);
 	void simpleProcess(DataFrame* df);
+	friend std::ostream &operator<<(std::ostream& os, const Camera& r) {
+		os << "[eye:" << r.eye << "lookat" << r.lookat <<  "]\n";
+		return os;
+	}
 };

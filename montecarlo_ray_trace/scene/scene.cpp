@@ -4,6 +4,7 @@
 #include <glm/gtx/vector_angle.hpp>
 #include <omp.h>    // openmp多线程加速
 #include <stdlib.h>
+#include "../sample/sample.h"
 
 #define SPP 1
 //#define DEBUG
@@ -15,10 +16,14 @@ Scene::Scene() {
 }
 Scene::Scene(string name) {
 	camera = new Camera(name);
+	cout << camera->eye;
+	cout << camera->lookat;
 	string pathname = "./scenes/" + name + "/" + name + ".obj";
 	obj = new Obj(pathname);
 	parseFromObj();
+	LOG("加载纹理");
 	initMaterial();
+	LOG("纹理加载完成，共" + to_string(texmap.size()) + "个纹理");
 	this->bvh = new BVH(BBs);
 	this->df = new DataFrame(camera->width, camera->height);
 	shade();
@@ -29,10 +34,7 @@ Scene::Scene(string name) {
 void Scene::parseFromObj() {
 	for (Triangle* tr : obj->triangles) {
 		BBs.push_back(BoundingBox(tr));
-		if (tr->material.name == "Light") {
-			Light cur(tr);
-			Lights.push_back(cur);
-		}
+		addLight(tr);
 	}
 	LOG("Lights number:" + to_string(Lights.size()));
 }
@@ -41,32 +43,34 @@ void Scene::shade() {
 	int w = camera->width, h = camera->height;
 	float theta = camera->fovy/2;
 	
-	float zpos = 1.0 / tan(theta);
-	
+	float zpos = 0.5 / tan(theta*PI/180);
+	float imageRatio = w * 1.0 / h;
 	for (int i = 0; i < h; i++) {
 		#ifndef DEBUG
 		omp_set_num_threads(10); // 线程个数
 		#pragma omp parallel for
 		#endif
-		for (int j = 0; j < w; j++) {
+		for (int j = 50; j < w; j++) {
 			// Screen space to NDC space
 			//float ny = 1.0f - (i + 0.5f) * 2 / h ;
 			//float nx = 1.0f - (j + 0.5f) * 2 / w ;
-			float nx = (j - w / 2) * 1.0 / w;
-			float ny = (h / 2 - i) * 1.0 / h;
-			// NDC space to world space
-			vec3 c_dir = vec3(nx, ny, -zpos);
-			vec3 z_dir = -normalize(camera->lookat - camera->eye);
-			vec3 up_dir = normalize(camera->up);
-			vec3 x_dir = normalize(cross(up_dir,z_dir));
-			vec3 world_dir = nx * x_dir + ny * up_dir - zpos * z_dir;
-			
-			Ray ray;
-			ray.direction = world_dir;
-			ray.startPoint = camera->eye;
-			
-			dvec3 color;
-			color = raysCasting(ray, i , j);
+			dvec3 color = dvec3(0,0,0);
+			for (int k = 0; k < SPP; k++) {
+					float nx,ny;
+					nx = (j  - w / 2) * 1.0 / w;
+					ny = (h / 2 - i ) * 1.0 / h;
+					nx *= imageRatio;
+					// NDC space to world space
+					vec3 c_dir = vec3(nx, ny, -zpos);
+					vec3 z_dir = -normalize(camera->lookat - camera->eye);
+					vec3 up_dir = normalize(camera->up);
+					vec3 x_dir = normalize(cross(up_dir,z_dir));
+					vec3 world_dir = nx * x_dir + ny * up_dir - zpos * z_dir;
+					Ray ray;
+					ray.direction = world_dir;
+					ray.startPoint = camera->eye;
+					color += rayCasting(ray, i , j)/(1.0*SPP);
+			}
 			gamma(color);
 			int pos = (i*w + j) * 3;
 			df->data[pos] = color.x;
@@ -95,13 +99,13 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		Material &m = hit_res.triangle->material;
 		vec3 cur_point = hit_res.intersectPoint;
 		m.Kd = m.isTex ? tr->getTex(cur_point, texmap[m.diffuse_texname]) : m.Kd;
-		if (m.isLight()) return vec3(17, 12, 4);
+		if (m.isLight()) return m.getIntensity();
 		vec3 N = tr->normal;
 		vec3 L = normalize(ray.direction);
-		vec3 f_r = m.BRDF(ray);
 		//return m.Kd;
 		//直接光照
-		for (Light& l : Lights) {
+		for(int k = 0; k < Lights.size(); k ++){
+			Light& l = Lights[k];
 			vec3 center = l.randomPoint();
 			//vec3 center = l.center;
 			Ray ray2(cur_point, center);
@@ -110,6 +114,7 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 			
 			//没有被遮挡
 			if (hit_res2.isIntersect) {
+				vec3 f_r = m.BRDF(ray, ray2, N);
 				if(isSamePoint(hit_res2.intersectPoint,center))
 				L_dir += l.intensity * f_r * fabs(dot(normalize(ray2.direction), N))
 				* fabs(dot(normalize(ray2.direction), l.normal))
@@ -117,6 +122,7 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 				/l.pdf_light;
 			}
 		}
+		return L_dir + L_indir;
 		//间接光照
 		float rate = rand()/(float)(RAND_MAX);
 		if (rate > STOP_RATE) return L_dir + L_indir;
@@ -127,7 +133,7 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		if (!hit_res3.triangle->material.isLight()) {
 			float pdf_hemi = 1.0 / (2.0 * PI);
 			float cosine = fabs(dot(normalize(randomRay.direction), N));
-			L_indir = f_r * cosine / pdf_hemi / STOP_RATE;
+			L_indir = m.BRDF(ray,randomRay,N) * cosine / pdf_hemi / STOP_RATE;
 			L_indir *= rayCasting(randomRay, i, j);
 		}
 	}
@@ -151,4 +157,10 @@ void gamma(dvec3& color) {
 }
 bool isSamePoint(vec3& a, vec3& b) {
 	return fabs(a.x - b.x) < EPSILON && fabs(a.y - b.y) < EPSILON && fabs(a.z - b.z) < EPSILON;
+}
+
+void Scene::addLight(Triangle* tr) {
+	if (tr->material.name.substr(0,5) == "Light") {
+		Lights.push_back(Light(tr));
+	}
 }

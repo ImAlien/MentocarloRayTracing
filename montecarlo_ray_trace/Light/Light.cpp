@@ -10,9 +10,6 @@ void print(vec3 p) {
 Light::Light(Triangle* tr) {
 	p1 = tr->p1, p2 = tr->p2, p3 = tr->p3;
 	center = p1 + p2 + p3;
-	print(p1);
-	print(p2);
-	print(p3);
 	center /= 3;
 	intensity = tr->getIntensity();
 	float a = sqrt(dot(p2 - p1, p2 - p1));
@@ -22,8 +19,6 @@ Light::Light(Triangle* tr) {
 	area = sqrt(p*(p - a)*(p - b)*(p - c));
 	pdf_light = 1.0 / area;
 	normal = tr->normal;
-		cout << "area && pdf" << endl;
-		cout << area << ' ' << pdf_light << endl;
 }
 vec3 Light::randomPoint() {
 

@@ -40,7 +40,7 @@ Camera::Camera(std::string type_, glm::vec3 eye_, glm::vec3 lookat_, glm::vec3 u
 	this->height = h_;
 }
 void Camera::bedroomCamera() {
-	new (this) Camera(
+	/*new (this) Camera(
 		"perspective",
 		glm::vec3(3.456, 1.212, 3.299),
 		glm::vec3(2.699, 1.195, 2.645),
@@ -48,6 +48,15 @@ void Camera::bedroomCamera() {
 		39.4305,
 		1280,
 		720
+	);*/
+	new (this) Camera(
+		"perspective",
+		glm::vec3(3.456, 1.212, 3.299),
+		glm::vec3(2.699, 1.195, 2.645),
+		glm::vec3(-0.013, 1.000, -0.011),
+		39.4305,
+		320,
+		180
 	);
 }
 
@@ -69,8 +78,8 @@ void Camera::veachmisCamera() {
 		glm::vec3(0.0, 1.69521, 14.0476),
 		glm::vec3(0.0, 0.952421, -0.304787),
 		27.3909,
-		1200,
-		900
+		300,
+		225
 	);
 }
 void Camera::defaultCamera() {

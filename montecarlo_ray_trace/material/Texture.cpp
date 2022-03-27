@@ -8,12 +8,26 @@ using namespace std;
 using namespace glm;
 
 vec3 Texture::get(float x, float y) {
-	int i = x * h;
-	int j = y * w;
+	if (x > 1 || y > 1) {
+		cerr <<"纹理坐标大于1";
+	}
+	if (x < 0 || y < 0) {
+		cerr << "纹理坐标小于0";
+	}
+	int i = x * (h-1);
+	int j = y * (w-1);
 	return get(i, j);
 }
 vec3 Texture::get(int i, int j) {
-	return tex[i][j];
+	vec3 res;
+	try {
+		res = tex[i*w +j];
+	}
+	catch ( ... ) {
+		cerr << "读取纹理失败" << endl;
+		cout <<' ' << i << ' ' <<j << endl;
+	}
+	return res;
 }
 Texture::Texture(string filename) {
 	cv::Mat image;
@@ -26,8 +40,7 @@ Texture::Texture(string filename) {
 	}
 	w = image.cols;
 	h = image.rows;
-	tex.resize(h);
-	for (int i = 0; i < h; i++) tex[i].resize(w);
+	tex = new vec3[w*h];
 	for (int i = 0; i < h; i++) {
 		for (int j = 0; j < w; j++) {
 			/*float x = tr->tex1.x - (int)tr->tex1.x;
@@ -44,7 +57,7 @@ Texture::Texture(string filename) {
 			b = powf(b, 2.2);
 			g = powf(g, 2.2);
 			r = powf(r, 2.2);
-			tex[i][j] = vec3(r, g, b);
+			tex[i*w +j] = vec3(r, g, b);
 		}
 	}
 }

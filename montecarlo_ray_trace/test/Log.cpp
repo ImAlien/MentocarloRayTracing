@@ -28,3 +28,8 @@ void LOG(std::string strMsg){
 		std::cout << "不能打开文件!" << std::endl;
 	}
 }
+
+std::ostream &operator<<(std::ostream& os, const glm::vec3& v) {
+	os << v.x << ' ' << v.y << ' ' << v.z << endl;
+	return os;
+}

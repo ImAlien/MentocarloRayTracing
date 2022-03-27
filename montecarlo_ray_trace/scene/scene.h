@@ -29,6 +29,7 @@ public:
 	glm::dvec3 raysCasting(Ray& ray, int& i, int& j);
 	glm::dvec3 rayCasting(Ray& ray, int& i, int& j);
 	void initMaterial();
+	void addLight(Triangle* tr);
 };
 
 void gamma(glm::dvec3& color);
