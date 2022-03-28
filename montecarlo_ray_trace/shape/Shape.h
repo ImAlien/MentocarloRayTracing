@@ -20,9 +20,8 @@ public:
 	std::vector<Point> points;
 	Material material;
 	Shape() {};
-	virtual IntersectResult intersect(Ray& ray) {
-		IntersectResult res;
-		return res;
+	virtual std::shared_ptr<IntersectResult> intersect(Ray& ray) {
+		return nullptr;
 	}
 };
 // Èý½ÇÐÎ
@@ -35,7 +34,7 @@ public:
 	glm::vec3 normal;
 	Triangle() {}
 	Triangle(Shape* s);
-	IntersectResult intersect(Ray& ray);
+	std::shared_ptr<IntersectResult> intersect(Ray& ray);
 	glm::vec3 getKd();
 	glm::vec3 getIntensity();
 	glm::vec3 getTex(glm::vec3 p, Texture* tex);

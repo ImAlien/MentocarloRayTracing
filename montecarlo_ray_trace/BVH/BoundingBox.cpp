@@ -17,7 +17,7 @@ BoundingBox::BoundingBox(glm::vec3 p1, glm::vec3 p2) {
 }
 float BoundingBox::intersectBB(Ray& r) {
 	// 1.0 / direction
-	glm::vec3 invdir = glm::vec3(1.0 / r.direction.x, 1.0 / r.direction.y, 1.0 / r.direction.z);
+	glm::vec3 invdir = r.direction_inv;
 
 	glm::vec3 in = (bb - r.startPoint) * invdir;
 	glm::vec3 out = (aa - r.startPoint) * invdir;

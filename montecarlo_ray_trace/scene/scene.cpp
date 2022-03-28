@@ -5,6 +5,7 @@
 #include <omp.h>    // openmp多线程加速
 #include <stdlib.h>
 #include "../sample/sample.h"
+#include <time.h>
 
 #define SPP 1
 //#define DEBUG
@@ -12,9 +13,11 @@
 using namespace std;
 using namespace glm;
 bool flag = true;
+clock_t start_t, finish_t;
 Scene::Scene() {
 }
 Scene::Scene(string name) {
+	start_t = clock();
 	camera = new Camera(name);
 	cout << camera->eye;
 	cout << camera->lookat;
@@ -26,7 +29,14 @@ Scene::Scene(string name) {
 	LOG("纹理加载完成，共" + to_string(texmap.size()) + "个纹理");
 	this->bvh = new BVH(BBs);
 	this->df = new DataFrame(camera->width, camera->height);
+	finish_t = clock();
+	double total_t = (double)(finish_t - start_t);//将时间转换为秒
+	cout << "预处理时间" << total_t << "毫秒" << endl;
+	start_t = clock();
 	shade();
+	finish_t = clock();
+	total_t = (double)(finish_t - start_t);//将时间转换为秒
+	cout << SPP<< "SPP渲染时间时间" << total_t << "毫秒" << endl;
 	df->inputImage();
 	LOG("保存图片");
 	camera->saveImage(df);
@@ -50,7 +60,7 @@ void Scene::shade() {
 		omp_set_num_threads(10); // 线程个数
 		#pragma omp parallel for
 		#endif
-		for (int j = 50; j < w; j++) {
+		for (int j = 0; j < w; j++) {
 			// Screen space to NDC space
 			//float ny = 1.0f - (i + 0.5f) * 2 / h ;
 			//float nx = 1.0f - (j + 0.5f) * 2 / w ;
@@ -69,6 +79,7 @@ void Scene::shade() {
 					Ray ray;
 					ray.direction = world_dir;
 					ray.startPoint = camera->eye;
+					ray.direction_inv = glm::vec3(1.0 / ray.direction.x, 1.0 / ray.direction.y, 1.0 / ray.direction.z);
 					color += rayCasting(ray, i , j)/(1.0*SPP);
 			}
 			gamma(color);
@@ -77,8 +88,6 @@ void Scene::shade() {
 			df->data[pos + 1] = color.y;
 			df->data[pos + 2] = color.z;
 		}
-		if(i % 10 == 0)
-		LOG("第" + to_string(i) + "行像素渲染完成");
 	}
 	LOG("渲染完成");
 }
@@ -93,11 +102,12 @@ dvec3 Scene::raysCasting(Ray& ray, int& x , int& y) {
 dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {	
 	dvec3 L_dir =  dvec3(0, 0, 0);
 	dvec3 L_indir = dvec3(0, 0, 0);
-	IntersectResult hit_res = bvh->intersectBVH(ray);
-	if (hit_res.isIntersect) {
-		Triangle* tr = hit_res.triangle;
-		Material &m = hit_res.triangle->material;
-		vec3 cur_point = hit_res.intersectPoint;
+	shared_ptr<IntersectResult> hit_res = bvh->intersectBVH(ray);
+	//return dvec3(1, 0, 0);
+	if (hit_res && hit_res->isIntersect) {
+		Triangle* tr = hit_res->triangle;
+		Material &m = hit_res->triangle->material;
+		vec3 cur_point = hit_res->intersectPoint;
 		m.Kd = m.isTex ? tr->getTex(cur_point, texmap[m.diffuse_texname]) : m.Kd;
 		if (m.isLight()) return m.getIntensity();
 		vec3 N = tr->normal;
@@ -110,27 +120,26 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 			//vec3 center = l.center;
 			Ray ray2(cur_point, center);
 			if (dot(ray2.direction, l.normal) >= 0) continue;
-			IntersectResult hit_res2 = bvh->intersectBVH(ray2);
+			shared_ptr<IntersectResult> hit_res2 = bvh->intersectBVH(ray2);
 			
 			//没有被遮挡
-			if (hit_res2.isIntersect) {
+			if (hit_res2 && hit_res2->isIntersect) {
 				vec3 f_r = m.BRDF(ray, ray2, N);
-				if(isSamePoint(hit_res2.intersectPoint,center))
+				if(isSamePoint(hit_res2->intersectPoint,center))
 				L_dir += l.intensity * f_r * fabs(dot(normalize(ray2.direction), N))
 				* fabs(dot(normalize(ray2.direction), l.normal))
 				/ dot(center - cur_point, center - cur_point)
 				/l.pdf_light;
 			}
 		}
-		return L_dir + L_indir;
 		//间接光照
 		float rate = rand()/(float)(RAND_MAX);
 		if (rate > STOP_RATE) return L_dir + L_indir;
 
 		Ray randomRay = randomHemisphereRay(N, cur_point);
-		IntersectResult hit_res3 = bvh->intersectBVH(randomRay);
-		if(hit_res3.isIntersect)
-		if (!hit_res3.triangle->material.isLight()) {
+		shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
+		if(hit_res3 && hit_res3->isIntersect)
+		if (!hit_res3->triangle->material.isLight()) {
 			float pdf_hemi = 1.0 / (2.0 * PI);
 			float cosine = fabs(dot(normalize(randomRay.direction), N));
 			L_indir = m.BRDF(ray,randomRay,N) * cosine / pdf_hemi / STOP_RATE;

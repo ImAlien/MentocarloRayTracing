@@ -5,11 +5,10 @@
 class Ray {
 public:
 	glm::vec3 startPoint;
-	glm::vec3 direction;
+	glm::vec3 direction,direction_inv;
 	Ray() {};
-	Ray(glm::vec3 p1, glm::vec3 p2) {
-		startPoint = p1;
-		direction = p2 - p1;
+	Ray(glm::vec3 p1, glm::vec3 p2):startPoint(p1),direction(p2 - p1) {
+		direction_inv = glm::vec3(1.0 / direction.x, 1.0 / direction.y, 1.0 /direction.z);
 	}
 	void cutAlittle();
 };

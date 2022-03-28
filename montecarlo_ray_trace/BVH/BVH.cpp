@@ -7,8 +7,9 @@
 using namespace std;
 using namespace glm;
 
-BVH::BVH(vector<BoundingBox>& BBs) {
+BVH::BVH(vector<BoundingBox>& BBs_) {
 	LOG("开始创建BVH");
+	this->BBs = BBs_;
 	root = build(BBs, 0, BBs.size() - 1);
 	cout << root->BB.aa.x << root->BB.bb.x; 
 	LOG("BVH创建完成");
@@ -61,36 +62,34 @@ BVHnode* BVH::build(vector<BoundingBox>& BBs, int l, int r) {
 	return node;
 }
 
-IntersectResult BVH::intersectBVH(Ray& ray) {
-	return intersectBVHnode(root, ray, 0.001,INF);
+shared_ptr<IntersectResult> BVH::intersectBVH(Ray& ray) const{
+	float tmin = 0.001, tmax = INF;
+	return intersectBVHnode(root, ray,tmin ,tmax);
 }
-IntersectResult BVH::intersectBVHnode(BVHnode* u, Ray& ray,float tmin, float tmax) {
-	IntersectResult res;
+shared_ptr<IntersectResult> BVH::intersectBVHnode(BVHnode* u, Ray& ray,float& tmin, float& tmax) const{
+	shared_ptr<IntersectResult> res = nullptr;
+	float tres = INF;
 	if (u == nullptr) return res;
-	if (u->isLeaf) return u->BB.source->intersect(ray);
+	
 	float tcur = u->BB.intersectBB(ray);
 	if (tcur == -1 || tcur >= tmax) return res;
-	IntersectResult res_left = intersectBVHnode(u->left, ray, tmin, tmax);
-	tmax = std::min(tmax, res_left.distance);
-	IntersectResult res_right = intersectBVHnode(u->right, ray,tmin, tmax);
-	tmax = std::min(tmax, res_right.distance);
-	if (res_left.isIntersect && res_left.distance > tmin) {
-		res.isIntersect = true;
-		res.distance = std::min(res.distance, res_left.distance);
-		res.triangle = res_left.triangle;
-		res.intersectPoint = res_left.intersectPoint;
+
+	if (u->isLeaf) return u->BB.source->intersect(ray);
+	shared_ptr<IntersectResult> res_left = intersectBVHnode(u->left, ray, tmin, tmax);
+	if(res_left)tmax = std::min(tmax, res_left->distance);
+	shared_ptr<IntersectResult> res_right = intersectBVHnode(u->right, ray,tmin, tmax);
+	if(res_right)tmax = std::min(tmax, res_right->distance);
+	if (res_left && res_left->isIntersect && res_left->distance < tres) {
+		res = res_left;
+		tres = res_left->distance;
 	}
-	if (res_right.isIntersect && res_right.distance > tmin) {
-		res.isIntersect = true;
-		if (res.distance > res_right.distance) {
-			res.distance = res_right.distance;
-			res.triangle = res_right.triangle;
-			res.intersectPoint = res_right.intersectPoint;
-		}
+	if (res_right && res_right->isIntersect && res_right->distance < tres) {
+		res = res_right;
+		tres = res_right->distance;
 	}
-	if (res.isIntersect && res.triangle == nullptr) {
+	/*if (res && res->isIntersect && res->triangle == nullptr) {
 		LOG("ERROR : intersect but no intersectionshape");
 		exit(1);
-	}
+	}*/
 	return res;
 }

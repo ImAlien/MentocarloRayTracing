@@ -4,8 +4,8 @@
 
 using namespace std;
 using namespace glm;
-IntersectResult Triangle::intersect(Ray& ray) {
-	IntersectResult res;
+shared_ptr<IntersectResult> Triangle::intersect(Ray& ray) {
+	shared_ptr<IntersectResult> res(new IntersectResult());
 
 	vec3& O = ray.startPoint;        // 射线起点
 	vec3& D = ray.direction;         // 射线方向
@@ -47,10 +47,10 @@ IntersectResult Triangle::intersect(Ray& ray) {
 	float b1 = dot(S1, S) / deno;
 	float b2 = dot(S2, D) / deno;
 	if (t > EPSILON && b1 >= 0 && b2 >= 0 && (1 - b1 - b2) >= 0) {
-		res.distance = t;
-		res.intersectPoint = O + t * D;
-		res.triangle = this;
-		res.isIntersect = true;
+		res->distance = t;
+		res->intersectPoint = O + t * D;
+		res->triangle = this;
+		res->isIntersect = true;
 		return res;
 	}
 	return res;
