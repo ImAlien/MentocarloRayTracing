@@ -38,5 +38,6 @@ public:
 	glm::vec3 getKd();
 	glm::vec3 getIntensity();
 	glm::vec3 getTex(glm::vec3 p, Texture* tex);
+	glm::vec3 getTex(std::shared_ptr<IntersectResult> hit, Texture* tex);
 };
 

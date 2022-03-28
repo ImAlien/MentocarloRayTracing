@@ -51,7 +51,9 @@ shared_ptr<IntersectResult> Triangle::intersect(Ray& ray) {
 		res->intersectPoint = O + t * D;
 		res->triangle = this;
 		res->isIntersect = true;
-		return res;
+		res->alpha = 1 - b1 - b2;
+		res->beta = b1;
+		res->gama = b2;
 	}
 	return res;
 }
@@ -89,4 +91,15 @@ glm::vec3 Triangle::getTex(glm::vec3 p, Texture* texMap) {
 	u = u - floor(u);
 	v = v - floor(v);
 	return texMap->get(u, v);
+}
+
+glm::vec3 Triangle::getTex(shared_ptr<IntersectResult> hit, Texture* tex) {
+	float alpha = hit->alpha;
+	float beta = hit->beta;
+	float gama = 1 - alpha - beta;
+	float u = tex1.x * alpha + tex2.x * beta + tex3.x * gama;
+	float v = tex1.y * alpha + tex2.y * beta + tex3.y * gama;
+	u = u - floor(u);
+	v = v - floor(v);
+	return tex->get(v, u);
 }

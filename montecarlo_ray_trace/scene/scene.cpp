@@ -7,13 +7,13 @@
 #include "../sample/sample.h"
 #include <time.h>
 
-#define SPP 1
+#define SPP 8
 //#define DEBUG
 #include<map>
 using namespace std;
 using namespace glm;
 bool flag = true;
-clock_t start_t, finish_t;
+clock_t start_t, finish_t, pre_t;
 Scene::Scene() {
 }
 Scene::Scene(string name) {
@@ -33,6 +33,7 @@ Scene::Scene(string name) {
 	double total_t = (double)(finish_t - start_t);//将时间转换为秒
 	cout << "预处理时间" << total_t << "毫秒" << endl;
 	start_t = clock();
+	pre_t = clock();
 	shade();
 	finish_t = clock();
 	total_t = (double)(finish_t - start_t);//将时间转换为秒
@@ -57,7 +58,7 @@ void Scene::shade() {
 	float imageRatio = w * 1.0 / h;
 	for (int i = 0; i < h; i++) {
 		#ifndef DEBUG
-		omp_set_num_threads(10); // 线程个数
+		omp_set_num_threads(20); // 线程个数
 		#pragma omp parallel for
 		#endif
 		for (int j = 0; j < w; j++) {
@@ -67,8 +68,8 @@ void Scene::shade() {
 			dvec3 color = dvec3(0,0,0);
 			for (int k = 0; k < SPP; k++) {
 					float nx,ny;
-					nx = (j  - w / 2) * 1.0 / w;
-					ny = (h / 2 - i ) * 1.0 / h;
+					nx = (j + randomf() - w / 2) * 1.0 / w;
+					ny = (h / 2 - i + randomf()) * 1.0 / h;
 					nx *= imageRatio;
 					// NDC space to world space
 					vec3 c_dir = vec3(nx, ny, -zpos);
@@ -87,6 +88,12 @@ void Scene::shade() {
 			df->data[pos] = color.x;
 			df->data[pos + 1] = color.y;
 			df->data[pos + 2] = color.z;
+		}
+		if (i % 10 == 0) {
+			finish_t = clock();
+			double total_t = (double)(finish_t - pre_t);//将时间转换为秒
+			cout  << i << "行像素时间" << total_t << "毫秒" << endl;
+			pre_t = finish_t;
 		}
 	}
 	LOG("渲染完成");
@@ -108,7 +115,7 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		Triangle* tr = hit_res->triangle;
 		Material &m = hit_res->triangle->material;
 		vec3 cur_point = hit_res->intersectPoint;
-		m.Kd = m.isTex ? tr->getTex(cur_point, texmap[m.diffuse_texname]) : m.Kd;
+		m.Kd = m.isTex ? tr->getTex(hit_res, texmap[m.diffuse_texname]) : m.Kd;
 		if (m.isLight()) return m.getIntensity();
 		vec3 N = tr->normal;
 		vec3 L = normalize(ray.direction);

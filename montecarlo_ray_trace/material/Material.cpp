@@ -70,15 +70,9 @@ bool isSame(vec3& a, vec3& b) {
 	return fabs(a.x - b.x) < EPSILON && fabs(a.y - b.y) < EPSILON && fabs(a.z - b.z) < EPSILON;
 }
 vec3 Material::BRDF(Ray& out, Ray& in, vec3& N) {
-	vec3 t = Kd + Ks;
-	float rate = sqrt(dot(t, t));
-	if (rate > 1) {
-		Kd /= rate;
-		Ks /= rate;
-	}
 	vec3 res = Kd / PI;
-	vec3 R = normalize(reflect(in, N));
-	res += (Ns + 2)*Ks*powf(fabs(dot(normalize(out.direction), R)), Ns) / (2 * PI);
+	/*vec3 R = normalize(reflect(in, N));
+	res += (Ns + 2)*Ks*powf(fabs(dot(normalize(out.direction), R)), Ns) / (2 * PI);*/
 	return res;
 }
 
