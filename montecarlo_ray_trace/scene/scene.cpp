@@ -7,7 +7,7 @@
 #include "../sample/sample.h"
 #include <time.h>
 
-#define SPP 4
+#define SPP 1
 //#define DEBUG
 #include<map>
 using namespace std;
@@ -36,8 +36,8 @@ Scene::Scene(string name) {
 	pre_t = clock();
 	shade();
 	finish_t = clock();
-	total_t = (double)(finish_t - start_t);//将时间转换为秒
-	cout << SPP<< "SPP渲染时间时间" << total_t << "毫秒" << endl;
+	total_t = (double)(finish_t - start_t)/CLOCKS_PER_SEC;//将时间转换为秒
+	cout << SPP<< "SPP渲染时间时间" << total_t << "秒" << endl;
 	df->inputImage();
 	LOG("保存图片");
 	camera->saveImage(df);
@@ -98,8 +98,8 @@ void Scene::shade() {
 		}
 		if (i % 10 == 0) {
 			finish_t = clock();
-			double total_t = (double)(finish_t - pre_t);//将时间转换为秒
-			cout  << i << "行像素时间" << total_t << "毫秒" << endl;
+			double total_t = (double)(finish_t - pre_t)/CLOCKS_PER_SEC;//将时间转换为秒
+			cout  << i << "行像素时间" << total_t << "秒" << endl;
 			pre_t = finish_t;
 		}
 	}
@@ -116,6 +116,7 @@ dvec3 Scene::raysCasting(Ray& ray, int& x , int& y) {
 dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {	
 	dvec3 L_dir =  dvec3(0, 0, 0);
 	dvec3 L_indir = dvec3(0, 0, 0);
+	dvec3 L_emit = dvec3(0, 0, 0);
 	shared_ptr<IntersectResult> hit_res = bvh->intersectBVH(ray);
 	//return dvec3(1, 0, 0);
 	if (hit_res && hit_res->isIntersect) {
@@ -123,9 +124,10 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		Material &m = hit_res->triangle->material;
 		vec3 cur_point = hit_res->intersectPoint;
 		m.Kd = m.isTex ? tr->getTex(hit_res, texmap[m.diffuse_texname]) : m.Kd;
-		if (m.isLight()) return m.getIntensity();
 		vec3 N = tr->normal;
 		vec3 L = normalize(ray.direction);
+		//是否光源
+		if (m.isLight()) L_emit = m.getIntensity();
 		//return m.Kd;
 		//直接光照
 		float random_area = randomf() * lights_area;
@@ -146,10 +148,9 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 				/lights_pdf;
 			}
 		}
-		
 		//间接光照
 		float rate = rand()/(float)(RAND_MAX);
-		if (rate > STOP_RATE) return L_dir + L_indir;
+		if (rate > STOP_RATE) return L_dir + L_indir + L_emit;
 
 		Ray randomRay = randomHemisphereRay(N, cur_point);
 		shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
@@ -161,7 +162,7 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 			L_indir *= rayCasting(randomRay, i, j);
 		}
 	}
-	return L_dir + L_indir;
+	return L_emit + L_dir + L_indir;
 }
 void Scene::initMaterial() {
 	for (Triangle* tr : obj->triangles) {
