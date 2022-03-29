@@ -7,7 +7,7 @@
 #include "../sample/sample.h"
 #include <time.h>
 
-#define SPP 8
+#define SPP 4
 //#define DEBUG
 #include<map>
 using namespace std;
@@ -47,6 +47,13 @@ void Scene::parseFromObj() {
 		BBs.push_back(BoundingBox(tr));
 		addLight(tr);
 	}
+	float sum = 0;
+	for (Light& l : Lights) {
+		sum += l.area;
+		areas.push_back(sum);
+	}
+	lights_area = sum;
+	lights_pdf = 1.0 / lights_area;
 	LOG("Lights number:" + to_string(Lights.size()));
 }
 void Scene::shade() {
@@ -121,14 +128,14 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		vec3 L = normalize(ray.direction);
 		//return m.Kd;
 		//直接光照
-		for(int k = 0; k < Lights.size(); k ++){
-			Light& l = Lights[k];
-			vec3 center = l.randomPoint();
-			//vec3 center = l.center;
-			Ray ray2(cur_point, center);
-			if (dot(ray2.direction, l.normal) >= 0) continue;
-			shared_ptr<IntersectResult> hit_res2 = bvh->intersectBVH(ray2);
-			
+		float random_area = randomf() * lights_area;
+		int k = binary_search(areas, random_area );
+		Light& l = Lights[k];
+		vec3 center = l.randomPoint();
+		//vec3 center = l.center;
+		Ray ray2(cur_point, center);
+		if (dot(ray2.direction, l.normal) < 0) {
+			shared_ptr<IntersectResult> hit_res2 = bvh->intersectBVH(ray2);		
 			//没有被遮挡
 			if (hit_res2 && hit_res2->isIntersect) {
 				vec3 f_r = m.BRDF(ray, ray2, N);
@@ -136,9 +143,10 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 				L_dir += l.intensity * f_r * fabs(dot(normalize(ray2.direction), N))
 				* fabs(dot(normalize(ray2.direction), l.normal))
 				/ dot(center - cur_point, center - cur_point)
-				/l.pdf_light;
+				/lights_pdf;
 			}
 		}
+		
 		//间接光照
 		float rate = rand()/(float)(RAND_MAX);
 		if (rate > STOP_RATE) return L_dir + L_indir;
@@ -179,4 +187,14 @@ void Scene::addLight(Triangle* tr) {
 	if (tr->material.name.substr(0,5) == "Light") {
 		Lights.push_back(Light(tr));
 	}
+}
+
+int binary_search(vector<float>& nums, float target) {
+	int l = 0, r = nums.size() - 1;
+	while (l < r) {
+		int mid = (l + r) / 2;
+		if (nums[mid] > target) r = mid;
+		else l = mid + 1;
+	}
+	return l;
 }

@@ -78,8 +78,8 @@ void Camera::veachmisCamera() {
 		glm::vec3(0.0, 1.69521, 14.0476),
 		glm::vec3(0.0, 0.952421, -0.304787),
 		27.3909,
-		300,
-		225
+		1200,
+		900
 	);
 }
 void Camera::defaultCamera() {

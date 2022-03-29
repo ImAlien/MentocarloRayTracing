@@ -18,6 +18,8 @@ public:
 	Camera* camera;
 	std::vector<BoundingBox> BBs;
 	std::vector<Light> Lights;
+	std::vector<float> areas;
+	float lights_area = 0, lights_pdf;// in order to use one random  light stand for  multiple lights;
 	Obj* obj;
 	BVH* bvh;
 	DataFrame* df;
@@ -34,3 +36,4 @@ public:
 
 void gamma(glm::dvec3& color);
 bool isSamePoint(glm::vec3& a, glm::vec3& b);
+int binary_search(std::vector<float>& nums, float target);
