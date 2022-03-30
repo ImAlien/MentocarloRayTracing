@@ -7,7 +7,7 @@
 #include "../sample/sample.h"
 #include <time.h>
 
-#define SPP 1
+#define SPP 180
 //#define DEBUG
 #include<map>
 using namespace std;
@@ -131,13 +131,17 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		//return m.Kd;
 		//直接光照
 		float random_area = randomf() * lights_area;
+		//随机一个光源
 		int k = binary_search(areas, random_area );
+		//随机一块面积
+		float RAND2 = randomf();
 		Light& l = Lights[k];
 		vec3 center = l.randomPoint();
 		//vec3 center = l.center;
 		Ray ray2(cur_point, center);
+		shared_ptr<IntersectResult> hit_res2;
 		if (dot(ray2.direction, l.normal) < 0) {
-			shared_ptr<IntersectResult> hit_res2 = bvh->intersectBVH(ray2);		
+			hit_res2 = bvh->intersectBVH(ray2);		
 			//没有被遮挡
 			if (hit_res2 && hit_res2->isIntersect) {
 				vec3 f_r = m.BRDF(ray, ray2, N);
@@ -145,7 +149,8 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 				L_dir += l.intensity * f_r * fabs(dot(normalize(ray2.direction), N))
 				* fabs(dot(normalize(ray2.direction), l.normal))
 				/ dot(center - cur_point, center - cur_point)
-				/lights_pdf;
+				/lights_pdf
+				*RAND2;
 			}
 		}
 		//间接光照
@@ -154,13 +159,16 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 
 		Ray randomRay = randomHemisphereRay(N, cur_point);
 		shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
-		if(hit_res3 && hit_res3->isIntersect)
-		if (!hit_res3->triangle->material.isLight()) {
-			float pdf_hemi = 1.0 / (2.0 * PI);
-			float cosine = fabs(dot(normalize(randomRay.direction), N));
-			L_indir = m.BRDF(ray,randomRay,N) * cosine / pdf_hemi / STOP_RATE;
-			L_indir *= rayCasting(randomRay, i, j);
+		if (hit_res3 && hit_res3->isIntersect) {
+			bool isLight = hit_res3->triangle->material.isLight();
+			if (!isLight || isLight && randomf() > RAND2) {
+				float pdf_hemi = 1.0 / (2.0 * PI);
+				float cosine = fabs(dot(normalize(randomRay.direction), N));
+				L_indir = m.BRDF(ray, randomRay, N) * cosine / pdf_hemi / STOP_RATE;
+				L_indir *= rayCasting(randomRay, i, j);
+			}
 		}
+		
 	}
 	return L_emit + L_dir + L_indir;
 }
