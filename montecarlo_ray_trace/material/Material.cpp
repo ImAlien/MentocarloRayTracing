@@ -71,8 +71,8 @@ bool isSame(vec3& a, vec3& b) {
 }
 vec3 Material::BRDF(Ray& out, Ray& in, vec3& N) {
 	vec3 res = Kd / PI;
-	vec3 R = normalize(reflect(in, N));
-	res += (Ns + 2)*Ks*powf(fabs(dot(normalize(out.direction), R)), Ns) / (2 * PI);
+	vec3 R = normalize(reflect(out, N));
+	res += (Ns + 2)*Ks*powf(glm::max(0.0f,dot(normalize(in.direction), R)), Ns) / (2 * PI);
 	return res;
 }
 

@@ -18,7 +18,7 @@ vec3 Inv(glm::vec3 dir) {
 	return res;
 }
  glm::vec3 reflect(Ray& r, glm::vec3& N) {
-	vec3 I = r.direction;
+	vec3 I = normalize(r.direction);
 	return I - 2 * dot(I, N) * N;
 }
  Ray reflect(Ray&r, glm::vec3& N, glm::vec3 p) {

@@ -7,7 +7,7 @@
 #include "../sample/sample.h"
 #include <time.h>
 
-#define SPP 180
+#define SPP 16
 //#define DEBUG
 #include<map>
 using namespace std;
@@ -157,15 +157,25 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		float rate = rand()/(float)(RAND_MAX);
 		if (rate > STOP_RATE) return L_dir + L_indir + L_emit;
 
-		Ray randomRay = randomHemisphereRay(N, cur_point);
-		shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
+		//Ray randomRay = randomHemisphereRay(N, cur_point);
+		//shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
+		//if (hit_res3 && hit_res3->isIntersect) {
+		//	bool isLight = hit_res3->triangle->material.isLight();
+		//	//if (!isLight || isLight && randomf() > RAND2) {
+		//		float pdf_hemi = 1.0 / (2.0 * PI);
+		//		float cosine = fabs(dot(normalize(randomRay.direction), N));
+		//		L_indir = m.BRDF(ray, randomRay, N) * cosine / pdf_hemi / STOP_RATE;
+		//		L_indir *= rayCasting(randomRay, i, j);
+		//	//}
+		//}
+		vec3 reflect_ray = reflect(ray, N);
+		Ray cosRandomRay = randomCosWeightSampling(reflect_ray, cur_point);
+		shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(cosRandomRay);
 		if (hit_res3 && hit_res3->isIntersect) {
 			bool isLight = hit_res3->triangle->material.isLight();
 			if (!isLight || isLight && randomf() > RAND2) {
-				float pdf_hemi = 1.0 / (2.0 * PI);
-				float cosine = fabs(dot(normalize(randomRay.direction), N));
-				L_indir = m.BRDF(ray, randomRay, N) * cosine / pdf_hemi / STOP_RATE;
-				L_indir *= rayCasting(randomRay, i, j);
+				L_indir = m.BRDF(ray, cosRandomRay, N) * PI / STOP_RATE;
+				L_indir *= rayCasting(cosRandomRay, i, j);
 			}
 		}
 		

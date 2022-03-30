@@ -8,6 +8,7 @@
 #include"camera/Camera.h"
 #include"obj/Obj.h"
 #include"scene/scene.h"
+#include"sample/sample.h"
 #include"test/Log.h"
 #include "main.h"
 #include<vector>
@@ -29,7 +30,16 @@ int main(void) {
 	//GOBJ = new Obj();
 	//GOBJ->loadFile("./scenes/bunny/bunny.obj");
 	LOG("---------------------new main----------------------");
+	srand(time(NULL));
 	GScene = new Scene(SCENE_NAME);
+	/*float sx = 0, sy = 0, sz = 0;
+	int k = 1000;
+	for (int i = 0; i < k; i++) {
+		vec3 t = randomCosDir();
+		cout << t;
+		sx += t.x; sy += t.y; sz += t.z;
+	}
+	cout << sx/k << ' ' << sy/k << ' ' << sz/k << endl;*/
 	system("pause");                        
 	return 0;
 }

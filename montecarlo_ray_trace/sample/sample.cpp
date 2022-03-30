@@ -19,3 +19,22 @@ vec3 toNormalHemisphere(vec3 v, vec3 N) {
 float randomf() {
 	return rand()*1.0 / RAND_MAX;
 }
+vec3 randomCosDir() {
+	float r1 = randomf(), r2 = randomf();
+	float thy = 2 * PI * r1;
+	float z = sqrt(r2);
+	float theta= acos(sqrt(r2));
+	float sintheta = sin(theta);
+	return vec3(sintheta * cos(thy), sintheta * sin(thy), z);
+}
+vec3 toLocal( vec3& N, vec3& w_dir) {
+	vec3 help = vec3(0, 0, 1);
+	vec3 x = normalize(cross(N, help));
+	vec3 y = normalize(cross(N, x));
+	return w_dir.x * x + w_dir.y * y + w_dir.z * N;
+}
+Ray randomCosWeightSampling( glm::vec3& N, glm::vec3 cur_point) {
+	vec3 world_dir = randomCosDir();
+	vec3 local_dir = toLocal(N, world_dir);
+	return Ray(cur_point, cur_point + local_dir);
+}
