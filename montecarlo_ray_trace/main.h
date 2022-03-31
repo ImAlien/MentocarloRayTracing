@@ -6,3 +6,5 @@
 #define SCENE_PATH "./scenes/"
 #define SCENE_NAME "veach-mis"
 #define STOP_RATE 0.6f
+#define DIFFUSE 0
+#define SPECULAR 1

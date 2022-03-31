@@ -7,7 +7,7 @@
 #include "../sample/sample.h"
 #include <time.h>
 
-#define SPP 16
+#define SPP 1024
 //#define DEBUG
 #include<map>
 using namespace std;
@@ -127,7 +127,7 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		vec3 N = tr->normal;
 		vec3 L = normalize(ray.direction);
 		//是否光源
-		if (m.isLight()) L_emit = m.getIntensity();
+		if (m.isLight())  L_emit = m.getIntensity();
 		//return m.Kd;
 		//直接光照
 		float random_area = randomf() * lights_area;
@@ -145,7 +145,8 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 			//没有被遮挡
 			if (hit_res2 && hit_res2->isIntersect) {
 				vec3 f_r = m.BRDF(ray, ray2, N);
-				if(isSamePoint(hit_res2->intersectPoint,center))
+				//if(isSamePoint(hit_res2->intersectPoint,center))
+				if(hit_res2->triangle->material.isLight())
 				L_dir += l.intensity * f_r * fabs(dot(normalize(ray2.direction), N))
 				* fabs(dot(normalize(ray2.direction), l.normal))
 				/ dot(center - cur_point, center - cur_point)
@@ -157,6 +158,36 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		float rate = rand()/(float)(RAND_MAX);
 		if (rate > STOP_RATE) return L_dir + L_indir + L_emit;
 
+		float t1 = sqrt(dot(m.Ks, m.Ks));
+		float t2 = sqrt(dot(m.Kd, m.Kd));
+		if (t1 + t2 == 0) return L_emit + L_dir;
+		float t = t1 / (t1 + t2);
+		float rate2 = randomf();
+		if (rate >= t) {
+			vec3 reflect_ray = reflect(ray, N);
+			Ray cosRandomRay = randomCosWeightSampling(N, cur_point);
+			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(cosRandomRay);
+			if (hit_res3 && hit_res3->isIntersect) {
+				bool isLight = hit_res3->triangle->material.isLight();
+				if (!isLight || isLight && randomf() > RAND2) {
+					L_indir = m.BRDF(ray, cosRandomRay, N) * PI / STOP_RATE/(1-t);
+					L_indir *= rayCasting(cosRandomRay, i, j);
+				}
+			}
+		}
+		else {
+			vec3 reflect_ray = reflect(ray, N);
+			Ray specularRay = randomSpecularSampling(reflect_ray, cur_point, m.Ns);
+			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(specularRay);
+			if (hit_res3 && hit_res3->isIntersect) {
+				bool islight = hit_res3->triangle->material.isLight();
+				if (!islight || islight && randomf() > RAND2) {
+					float pdf = (m.Ns + 1)/(2*PI);
+					L_indir = m.BRDF(ray, specularRay, N) / pdf/STOP_RATE/t;
+					L_indir *= rayCasting(specularRay, i, j);
+				}
+			}
+		}
 		//Ray randomRay = randomHemisphereRay(N, cur_point);
 		//shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
 		//if (hit_res3 && hit_res3->isIntersect) {
@@ -168,16 +199,6 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		//		L_indir *= rayCasting(randomRay, i, j);
 		//	//}
 		//}
-		vec3 reflect_ray = reflect(ray, N);
-		Ray cosRandomRay = randomCosWeightSampling(reflect_ray, cur_point);
-		shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(cosRandomRay);
-		if (hit_res3 && hit_res3->isIntersect) {
-			bool isLight = hit_res3->triangle->material.isLight();
-			if (!isLight || isLight && randomf() > RAND2) {
-				L_indir = m.BRDF(ray, cosRandomRay, N) * PI / STOP_RATE;
-				L_indir *= rayCasting(cosRandomRay, i, j);
-			}
-		}
 		
 	}
 	return L_emit + L_dir + L_indir;
