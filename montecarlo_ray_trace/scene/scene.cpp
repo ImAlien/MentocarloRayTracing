@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "../sample/sample.h"
 #include <time.h>
+#include <set>
 
 #define SPP 1024
 //#define DEBUG
@@ -55,6 +56,14 @@ void Scene::parseFromObj() {
 	lights_area = sum;
 	lights_pdf = 1.0 / lights_area;
 	LOG("Lights number:" + to_string(Lights.size()));
+	initufLights();
+	set<int> roots;
+	for (int i = 0; i < Lights.size(); i++) {
+		roots.insert(uflights.find(i));
+	}
+	for (int x : roots) {
+		cout << x << ' ' << uflights.areas[x] << ' ' << endl;
+	}
 }
 void Scene::shade() {
 	LOG("开始渲染");
@@ -131,27 +140,28 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		//return m.Kd;
 		//直接光照
 		float random_area = randomf() * lights_area;
-		//随机一个光源
-		int k = binary_search(areas, random_area );
-		//随机一块面积
-		float RAND2 = randomf();
-		Light& l = Lights[k];
-		vec3 center = l.randomPoint();
-		//vec3 center = l.center;
-		Ray ray2(cur_point, center);
-		shared_ptr<IntersectResult> hit_res2;
-		if (dot(ray2.direction, l.normal) < 0) {
-			hit_res2 = bvh->intersectBVH(ray2);		
-			//没有被遮挡
-			if (hit_res2 && hit_res2->isIntersect) {
-				vec3 f_r = m.BRDF(ray, ray2, N);
-				//if(isSamePoint(hit_res2->intersectPoint,center))
-				if(hit_res2->triangle->material.isLight())
-				L_dir += l.intensity * f_r * fabs(dot(normalize(ray2.direction), N))
-				* fabs(dot(normalize(ray2.direction), l.normal))
-				/ dot(center - cur_point, center - cur_point)
-				/lights_pdf
-				*RAND2;
+		for (auto& lightgroup : divideLights) {
+			int x = lightgroup.first;
+			vector<int>& p_Lights = lightgroup.second;
+			int k = randomf()*(p_Lights.size()-1);
+			float t_area = uflights.areas[x];
+			Light& l = Lights[p_Lights[k]];
+			vec3 center = l.randomPoint();
+			//vec3 center = l.center;
+			Ray ray2(cur_point, center);
+			shared_ptr<IntersectResult> hit_res2;
+			if (dot(ray2.direction, l.normal) < 0) {
+				hit_res2 = bvh->intersectBVH(ray2);
+				//没有被遮挡
+				if (hit_res2 && hit_res2->isIntersect) {
+					vec3 f_r = m.BRDF(ray, ray2, N);
+					//if(isSamePoint(hit_res2->intersectPoint,center))
+					if (hit_res2->triangle->material.isLight())
+						L_dir += l.intensity * f_r * fabs(dot(normalize(ray2.direction), N))
+						* fabs(dot(normalize(ray2.direction), l.normal))
+						/ dot(center - cur_point, center - cur_point)
+						* t_area;
+				}
 			}
 		}
 		//间接光照
@@ -169,10 +179,14 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(cosRandomRay);
 			if (hit_res3 && hit_res3->isIntersect) {
 				bool isLight = hit_res3->triangle->material.isLight();
-				if (!isLight || isLight && randomf() > RAND2) {
-					L_indir = m.BRDF(ray, cosRandomRay, N) * PI / STOP_RATE/(1-t);
-					L_indir *= rayCasting(cosRandomRay, i, j);
-				}
+				//if (!isLight || isLight && randomf() > RAND2) {
+				//float pdf = dot(N, cosRandomRay.direction)/PI;
+					//L_indir = m.BRDF(ray, cosRandomRay, N)/pdf / STOP_RATE/(1-t);
+					//L_indir *= rayCasting(cosRandomRay, i, j);
+				vec3 f_r = m.Kd / dot(N, cosRandomRay.direction);
+				L_indir = f_r /STOP_RATE;
+				L_indir *= rayCasting(cosRandomRay, i, j);
+			//	}
 			}
 		}
 		else {
@@ -180,25 +194,29 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 			Ray specularRay = randomSpecularSampling(reflect_ray, cur_point, m.Ns);
 			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(specularRay);
 			if (hit_res3 && hit_res3->isIntersect) {
-				bool islight = hit_res3->triangle->material.isLight();
-				if (!islight || islight && randomf() > RAND2) {
-					float pdf = (m.Ns + 1)/(2*PI);
-					L_indir = m.BRDF(ray, specularRay, N) / pdf/STOP_RATE/t;
-					L_indir *= rayCasting(specularRay, i, j);
-				}
+				bool isLight = hit_res3->triangle->material.isLight();
+			//	if (!islight || islight && randomf() > RAND2) {
+					//float pdf = (m.Ns + 1)/(2*PI)*powf(dot(reflect_ray,specularRay.direction), m.Ns);
+					//L_indir = m.BRDF(ray, specularRay, N) / pdf/STOP_RATE/t;
+				vec3 f_r = m.Ks*(m.Ns + 2) / (m.Ns + 1);
+				L_indir = f_r / STOP_RATE;
+				L_indir *= rayCasting(specularRay, i, j);
+				//if (isLight) L_indir *= RAND2;
+			//	}
 			}
 		}
-		//Ray randomRay = randomHemisphereRay(N, cur_point);
-		//shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
-		//if (hit_res3 && hit_res3->isIntersect) {
-		//	bool isLight = hit_res3->triangle->material.isLight();
-		//	//if (!isLight || isLight && randomf() > RAND2) {
-		//		float pdf_hemi = 1.0 / (2.0 * PI);
-		//		float cosine = fabs(dot(normalize(randomRay.direction), N));
-		//		L_indir = m.BRDF(ray, randomRay, N) * cosine / pdf_hemi / STOP_RATE;
-		//		L_indir *= rayCasting(randomRay, i, j);
-		//	//}
-		//}
+		Ray randomRay = randomHemisphereRay(N, cur_point);
+		shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
+		if (hit_res3 && hit_res3->isIntersect) {
+			bool isLight = hit_res3->triangle->material.isLight();
+			//if (!isLight || isLight && randomf() > RAND2) {
+				float pdf_hemi = 1.0 / (2.0 * PI);
+				float cosine = fabs(dot(normalize(randomRay.direction), N));
+				L_indir = m.BRDF(ray, randomRay, N) * cosine / pdf_hemi / STOP_RATE;
+				L_indir *= rayCasting(randomRay, i, j);
+				//if (isLight) L_indir *= RAND2;
+			//}
+		}
 		
 	}
 	return L_emit + L_dir + L_indir;
@@ -237,4 +255,30 @@ int binary_search(vector<float>& nums, float target) {
 		else l = mid + 1;
 	}
 	return l;
+}
+bool connect(vector<Light>& lights, int i, int j) {
+	Light& x = lights[i], &y = lights[j];
+	if (x.p1 == y.p1 || x.p2 == y.p1 || x.p3 == y.p1) return true;
+	if (x.p1 == y.p2 || x.p2 == y.p2 || x.p3 == y.p2) return true;
+	if (x.p1 == y.p2 || x.p2 == y.p2 || x.p3 == y.p2) return true;
+	return false;
+}
+void Scene::initufLights() {
+	int n = Lights.size();
+	uflights.init(n);
+	for (int i = 0; i < n; i++) {
+		uflights.areas[i] = Lights[i].area;
+	}
+	for (int i = 0; i < n; i++) {
+		for (int j = i + 1; j < n; j++) {
+			if (connect(Lights, i, j)) {
+				uflights.merge(i, j);
+			}
+		}
+	}
+	for (int i = 0; i < n; i++) divideLights[uflights.find(i)].push_back(i);
+	
+	for (auto m : divideLights) {
+		cout <<"光源:" <<m.first << ' ' << m.second.size() << endl;
+	}
 }

@@ -110,6 +110,9 @@
     <ClInclude Include="material\Texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="scene\util.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\svpng.inc">

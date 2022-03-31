@@ -153,6 +153,7 @@
     <ClInclude Include="ray\Ray.h" />
     <ClInclude Include="sample\sample.h" />
     <ClInclude Include="scene\scene.h" />
+    <ClInclude Include="scene\util.h" />
     <ClInclude Include="shape\Shape.h" />
     <ClInclude Include="test\Log.h" />
   </ItemGroup>
