@@ -15,4 +15,7 @@ public:
 
  Ray randomHemisphereRay(glm::vec3 N, glm::vec3 p);
 glm::vec3 reflect(Ray& r, glm::vec3& N);
-Ray reflect(Ray&r, glm::vec3& N, glm::vec3 p);
+Ray reflect(Ray&r, glm::vec3& N, glm::vec3& p);
+glm::vec3 refract(glm::vec3& N, glm::vec3& I, float n1, float n2);
+Ray refract(Ray&r, glm::vec3& N, glm::vec3&p, float n1, float n2);
+float shlick(glm::vec3 N, glm::vec3 I, float n1, float n2);

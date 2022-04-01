@@ -8,7 +8,7 @@
 #include <time.h>
 #include <set>
 
-#define SPP 16000
+#define SPP 4
 //#define DEBUG
 #include<map>
 using namespace std;
@@ -126,6 +126,8 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 	dvec3 L_dir =  dvec3(0, 0, 0);
 	dvec3 L_indir = dvec3(0, 0, 0);
 	dvec3 L_emit = dvec3(0, 0, 0);
+	dvec3 L_frac = dvec3(0, 0, 0);
+	double Ct = 0, Cr = 1;
 	shared_ptr<IntersectResult> hit_res = bvh->intersectBVH(ray);
 	//return dvec3(1, 0, 0);
 	if (hit_res && hit_res->isIntersect) {
@@ -134,17 +136,30 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		vec3 cur_point = hit_res->intersectPoint;
 		m.Kd = m.isTex ? tr->getTex(hit_res, texmap[m.diffuse_texname]) : m.Kd;
 		vec3 N = tr->normal;
-		vec3 L = normalize(ray.direction);
+		vec3 I = normalize(ray.direction);
 		//是否光源
 		if (m.isLight())  L_emit = m.getIntensity();
 		//return m.Kd;
 
+		//fraction
+		
+		if (m.Ni > 1) {
+			float rate = rand() / (float)(RAND_MAX);
+			if (rate > STOP_RATE) return L_dir + L_indir + L_emit;
+			Ray rayFraction = refract(ray, N,cur_point, 1.0f, m.Ni);
+			if (rayFraction.direction != vec3(0, 0, 0)) {
+				Cr = shlick(N, normalize(ray.direction), 1.0f, m.Ni);
+				L_frac = rayCasting(rayFraction, i, j) * (1.0 - Cr);
+				L_frac /= STOP_RATE;
+			}
+		}
 		float t1 = sqrt(dot(m.Ks, m.Ks));
 		float t2 = sqrt(dot(m.Kd, m.Kd));
-		if (t1 + t2 == 0) return L_emit + L_dir;
+		if (t1 + t2 == 0) return L_emit + L_frac;
 		float t = t1 / (t1 + t2);
 		float rate2 = randomf();
-		if (rate2 >= t) {
+		if (rate2 >= t) {//diffuse
+
 			//直接光照
 			float random_area = randomf() * lights_area;
 			for (auto& lightgroup : divideLights) {
@@ -161,7 +176,7 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 					hit_res2 = bvh->intersectBVH(ray2);
 					//没有被遮挡
 					if (hit_res2 && hit_res2->isIntersect) {
-						vec3 f_r = m.BRDF(ray, ray2, N);
+						vec3 f_r = m.Kd/PI;
 						if (isSamePoint(hit_res2->intersectPoint, center))
 							//if (hit_res2->triangle->material.isLight())
 							L_dir += l.intensity * f_r * fabs(dot(normalize(ray2.direction), N))
@@ -174,23 +189,37 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 			//间接光照
 			float rate = rand() / (float)(RAND_MAX);
 			if (rate > STOP_RATE) return L_dir + L_indir + L_emit;
-			vec3 reflect_ray = reflect(ray, N);
-			Ray cosRandomRay = randomCosWeightSampling(N, cur_point);
-			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(cosRandomRay);
+
+			Ray randomRay = randomHemisphereRay(N, cur_point);
+			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
 			if (hit_res3 && hit_res3->isIntersect) {
 				bool isLight = hit_res3->triangle->material.isLight();
-				if (!isLight) {
-					//float pdf = dot(N, cosRandomRay.direction)/PI;
-						//L_indir = m.BRDF(ray, cosRandomRay, N)/pdf / STOP_RATE/(1-t);
-						//L_indir *= rayCasting(cosRandomRay, i, j);
-					vec3 f_r = m.Kd / dot(N, cosRandomRay.direction);
-					L_indir = f_r / STOP_RATE;
-					L_indir *= rayCasting(cosRandomRay, i, j);
+				if (!isLight ) {
+				float pdf_hemi = 1.0 / (2.0 * PI);
+				float cosine = fabs(dot(normalize(randomRay.direction), N));
+				L_indir = m.Kd * 2.0f * cosine  / STOP_RATE;
+				L_indir *= rayCasting(randomRay, i, j);
+				//if (isLight) L_indir *= RAND2;
 				}
-			//	}
 			}
+
+			//vec3 reflect_ray = reflect(ray, N);
+			//Ray cosRandomRay = randomCosWeightSampling(N, cur_point);
+			//shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(cosRandomRay);
+			//if (hit_res3 && hit_res3->isIntersect) {
+			//	bool isLight = hit_res3->triangle->material.isLight();
+			//	if (!isLight) {
+			//		//float pdf = dot(N, cosRandomRay.direction)/PI;
+			//			//L_indir = m.BRDF(ray, cosRandomRay, N)/pdf / STOP_RATE/(1-t);
+			//			//L_indir *= rayCasting(cosRandomRay, i, j);
+			//		vec3 f_r = m.Kd / dot(N, cosRandomRay.direction);
+			//		L_indir = f_r / STOP_RATE;
+			//		L_indir *= rayCasting(cosRandomRay, i, j);
+			//	}
+			////	}
+			//}
 		}
-		else {
+		else {//specular
 			//间接光照
 			float rate = rand() / (float)(RAND_MAX);
 			if (rate > STOP_RATE) return L_dir + L_indir + L_emit;
@@ -224,7 +253,7 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		//}
 		
 	}
-	return L_emit + L_dir + L_indir;
+	return L_emit + (L_dir + L_indir)*Cr + L_frac;
 }
 void Scene::initMaterial() {
 	for (Triangle* tr : obj->triangles) {
