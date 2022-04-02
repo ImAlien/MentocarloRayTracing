@@ -10,3 +10,4 @@ Ray randomCosWeightSampling(glm::vec3& N, glm::vec3 cur_point);
 float randomf();
 glm::vec3 randomCosDir();
 Ray randomSpecularSampling(glm::vec3& dir, glm::vec3 s, int Ns);
+Ray randomHemisphere(glm::vec3& N, glm::vec3 cur_point);

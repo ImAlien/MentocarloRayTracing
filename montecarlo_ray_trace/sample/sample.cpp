@@ -19,6 +19,13 @@ vec3 toNormalHemisphere(vec3 v, vec3 N) {
 float randomf() {
 	return rand()*1.0 / RAND_MAX;
 }
+vec3 randomDir() {
+	float r1 = randomf(), r2 = randomf();
+	float thy = 2 * PI * r1;
+	float theta = acos(1 - r2);
+	float sintheta = sin(theta);
+	return vec3(sintheta * cos(thy), sintheta * sin(thy), 1 - r2);
+}
 vec3 randomCosDir() {
 	float r1 = randomf(), r2 = randomf();
 	float thy = 2 * PI * r1;
@@ -56,4 +63,9 @@ Ray randomSpecularSampling(glm::vec3& dir, glm::vec3 s, int Ns) {
 	vec3 local = randomSpeDir(Ns);
 	vec3 world = toWorld(dir, local);
 	return Ray(s, s + world);
+}
+Ray randomHemisphere(glm::vec3& N, glm::vec3 cur_point) {
+	vec3 local = randomDir();
+	vec3 world = toWorld(N, local);
+	return Ray(cur_point, cur_point + world);
 }
