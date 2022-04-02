@@ -6,8 +6,6 @@ c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找
   Light.cpp
 c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
 d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\light\light.cpp(20): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-  Camera.cpp
-c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
   main.cpp
 c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
 d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\main.cpp(34): warning C4244: “参数”: 从“time_t”转换到“unsigned int”，可能丢失数据
@@ -18,6 +16,9 @@ c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找
 d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\obj\obj.cpp(44): warning C4018: “<”: 有符号/无符号不匹配
   Ray.cpp
 c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\ray\ray.cpp(41): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\ray\ray.cpp(43): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\ray\ray.cpp(59): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
   sample.cpp
 c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
 d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\sample\sample.cpp(6): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
@@ -27,27 +28,30 @@ d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\sample\sample.cpp(20): wa
 d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\sample\sample.cpp(33): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
   scene.cpp
 c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(56): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(62): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(64): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(65): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(78): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(79): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(179): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(217): warning C4305: “参数”: 从“double”到“float”截断
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(217): warning C4244: “参数”: 从“T”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(57): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(61): warning C4018: “<”: 有符号/无符号不匹配
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(71): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(73): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(74): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(87): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(88): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(168): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(198): warning C4305: “初始化”: 从“double”到“float”截断
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(228): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(270): warning C4305: “参数”: 从“double”到“float”截断
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(270): warning C4244: “参数”: 从“T”转换到“float”，可能丢失数据
           with
           [
               T=glm::f64
           ]
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(218): warning C4305: “参数”: 从“double”到“float”截断
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(218): warning C4244: “参数”: 从“T”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(271): warning C4305: “参数”: 从“double”到“float”截断
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(271): warning C4244: “参数”: 从“T”转换到“float”，可能丢失数据
           with
           [
               T=glm::f64
           ]
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(219): warning C4305: “参数”: 从“double”到“float”截断
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(219): warning C4244: “参数”: 从“T”转换到“float”，可能丢失数据
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(272): warning C4305: “参数”: 从“double”到“float”截断
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(272): warning C4244: “参数”: 从“T”转换到“float”，可能丢失数据
           with
           [
               T=glm::f64
@@ -55,5 +59,5 @@ d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\scene\scene.cpp(219): war
   Trangle.cpp
 c1xx : warning C4199: C++/CLI、C++/CX 或 OpenMP 不支持两阶段名称查找；请使用 /Zc:twoPhase-
   正在生成代码...
-d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\shape\trangle.cpp(76): warning C4715: “Triangle::getKd”: 不是所有的控件路径都返回值
+d:\course\cg\montecarlo_ray_trace\montecarlo_ray_trace\shape\trangle.cpp(77): warning C4715: “Triangle::getKd”: 不是所有的控件路径都返回值
   montecarlo_ray_trace.vcxproj -> D:\course\CG\montecarlo_ray_trace\Debug\montecarlo_ray_trace.exe

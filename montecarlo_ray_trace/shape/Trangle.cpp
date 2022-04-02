@@ -5,6 +5,7 @@
 using namespace std;
 using namespace glm;
 shared_ptr<IntersectResult> Triangle::intersect(Ray& ray) {
+
 	shared_ptr<IntersectResult> res(new IntersectResult());
 
 	vec3& O = ray.startPoint;        // ÉäÏßÆğµã
