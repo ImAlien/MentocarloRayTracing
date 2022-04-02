@@ -102,5 +102,5 @@ glm::vec3 Triangle::getTex(shared_ptr<IntersectResult> hit, Texture* tex) {
 	float v = tex1.y * alpha + tex2.y * beta + tex3.y * gama;
 	u = u - floor(u);
 	v = v - floor(v);
-	return tex->get(v, u);
+	return tex->get(u, v);
 }
