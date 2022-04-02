@@ -80,12 +80,19 @@
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <OpenMPSupport>true</OpenMPSupport>
       <ExceptionHandling>Async</ExceptionHandling>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
-      <StackReserveSize>200000000</StackReserveSize>
+      <StackReserveSize>
+      </StackReserveSize>
     </Link>
     <Link>
-      <StackCommitSize>200000000</StackCommitSize>
+      <StackCommitSize>
+      </StackCommitSize>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -107,12 +114,15 @@
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
       <ExceptionHandling>Async</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <StackReserveSize>200000000</StackReserveSize>
-      <StackCommitSize>200000000</StackCommitSize>
+      <StackReserveSize>
+      </StackReserveSize>
+      <StackCommitSize>
+      </StackCommitSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

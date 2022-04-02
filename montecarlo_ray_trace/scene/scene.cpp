@@ -155,7 +155,7 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 		}
 		float t1 = sqrt(dot(m.Ks, m.Ks));
 		float t2 = sqrt(dot(m.Kd, m.Kd));
-		if (t1 + t2 == 0) return L_emit + L_frac;
+		if (t1 + t2 < EPSILON) return L_emit + L_frac;
 		float t = t1 / (t1 + t2);
 		float rate2 = randomf();
 		if (rate2 >= t) {//diffuse
@@ -190,34 +190,34 @@ dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 			float rate = rand() / (float)(RAND_MAX);
 			if (rate > STOP_RATE) return L_dir + L_indir + L_emit;
 
-			Ray randomRay = randomHemisphereRay(N, cur_point);
-			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
-			if (hit_res3 && hit_res3->isIntersect) {
-				bool isLight = hit_res3->triangle->material.isLight();
-				if (!isLight ) {
-				float pdf_hemi = 1.0 / (2.0 * PI);
-				float cosine = fabs(dot(normalize(randomRay.direction), N));
-				L_indir = m.Kd * 2.0f * cosine  / STOP_RATE;
-				L_indir *= rayCasting(randomRay, i, j);
-				//if (isLight) L_indir *= RAND2;
-				}
-			}
-
-			//vec3 reflect_ray = reflect(ray, N);
-			//Ray cosRandomRay = randomCosWeightSampling(N, cur_point);
-			//shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(cosRandomRay);
+			//Ray randomRay = randomHemisphereRay(N, cur_point);
+			//shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
 			//if (hit_res3 && hit_res3->isIntersect) {
 			//	bool isLight = hit_res3->triangle->material.isLight();
-			//	if (!isLight) {
-			//		//float pdf = dot(N, cosRandomRay.direction)/PI;
-			//			//L_indir = m.BRDF(ray, cosRandomRay, N)/pdf / STOP_RATE/(1-t);
-			//			//L_indir *= rayCasting(cosRandomRay, i, j);
-			//		vec3 f_r = m.Kd / dot(N, cosRandomRay.direction);
-			//		L_indir = f_r / STOP_RATE;
-			//		L_indir *= rayCasting(cosRandomRay, i, j);
+			//	if (!isLight ) {
+			//	float pdf_hemi = 1.0 / (2.0 * PI);
+			//	float cosine = fabs(dot(normalize(randomRay.direction), N));
+			//	L_indir = m.Kd * 2.0f * cosine  / STOP_RATE;
+			//	L_indir *= rayCasting(randomRay, i, j);
+			//	//if (isLight) L_indir *= RAND2;
 			//	}
-			////	}
 			//}
+
+			vec3 reflect_ray = reflect(ray, N);
+			Ray cosRandomRay = randomCosWeightSampling(N, cur_point);
+			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(cosRandomRay);
+			if (hit_res3 && hit_res3->isIntersect) {
+				bool isLight = hit_res3->triangle->material.isLight();
+				if (!isLight) {
+					//float pdf = dot(N, cosRandomRay.direction)/PI;
+						//L_indir = m.BRDF(ray, cosRandomRay, N)/pdf / STOP_RATE/(1-t);
+						//L_indir *= rayCasting(cosRandomRay, i, j);
+					vec3 f_r = m.Kd / dot(N, cosRandomRay.direction);
+					L_indir = f_r / STOP_RATE;
+					L_indir *= rayCasting(cosRandomRay, i, j);
+				}
+			//	}
+			}
 		}
 		else {//specular
 			//º‰Ω”π‚’’

@@ -34,19 +34,26 @@ vec3 randomSpeDir(int Ns) {
 	float sintheta = sin(theta);
 	return vec3(sintheta * cos(thy), sintheta * sin(thy), cos(theta));
 }
-vec3 toLocal( vec3& N, vec3& w_dir) {
-	vec3 help = vec3(0, 0, 1);
-	vec3 x = normalize(cross(N, help));
-	vec3 y = normalize(cross(N, x));
-	return w_dir.x * x + w_dir.y * y + w_dir.z * N;
+vec3 toWorld( vec3& N, vec3& w_dir) {
+	vec3 X, Y;
+	if (fabs(N.x) > fabs(N.y)) {
+		float inv = 1.0f / sqrt(N.x * N.x + N.z * N.z);
+		Y = vec3(N.z*inv, 0, -N.x*inv);
+	}
+	else {
+		float inv = 1.0f / sqrt(N.y * N.y + N.z * N.z);
+		Y = vec3(0, N.z*inv , -N.y*inv);
+	}
+	X = cross(Y, N);
+	return w_dir.x * X + w_dir.y * Y + w_dir.z * N;
 }
 Ray randomCosWeightSampling( glm::vec3& N, glm::vec3 cur_point) {
-	vec3 world_dir = randomCosDir();
-	vec3 local_dir = toLocal(N, world_dir);
-	return Ray(cur_point, cur_point + local_dir);
+	vec3 local = randomCosDir();
+	vec3 world = toWorld(N, local);
+	return Ray(cur_point, cur_point + world);
 }
 Ray randomSpecularSampling(glm::vec3& dir, glm::vec3 s, int Ns) {
-	vec3 world_dir = randomSpeDir(Ns);
-	vec3 local_dir = toLocal(dir, world_dir);
-	return Ray(s, s + local_dir);
+	vec3 local = randomSpeDir(Ns);
+	vec3 world = toWorld(dir, local);
+	return Ray(s, s + world);
 }
