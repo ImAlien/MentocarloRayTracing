@@ -14,7 +14,7 @@ vec3 Texture::get(float x, float y) {
 	if (x < 0 || y < 0) {
 		cerr << "纹理坐标小于0";
 	}
-	int i = y * (h-1);
+	int i = (1.0-y) * (h-1);
 	int j = x * (w-1);
 	return get(i, j);
 }
