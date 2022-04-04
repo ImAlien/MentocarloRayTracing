@@ -32,9 +32,6 @@ vec3 Inv(glm::vec3 dir) {
  glm::vec3 refract(glm::vec3& N, glm::vec3& I, float n1, float n2) {
 	 if (dot(N, I) > 0) {
 		 N = -N;
-		 float t = n2; 
-		 n2 = n1;
-		 n1 = t;
 	 }
 	 float n = n1 / n2;
 	 float cosI = -dot(N, I);

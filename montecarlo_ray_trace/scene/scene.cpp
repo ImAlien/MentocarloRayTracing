@@ -8,7 +8,7 @@
 #include <time.h>
 #include <set>
 
-#define SPP 4
+#define SPP 512
 //#define DEBUG
 #include<map>
 using namespace std;
