@@ -29,6 +29,14 @@ Camera::Camera(string scenename) {
 		defaultCamera();
 	}
 }
+/*
+type: 类型：平行投影 or 透视投影
+eye:相机位置
+lookat: 相机朝向
+up: 相机头顶方向
+fovy: 相机观察的角度
+width, heitht: 生成照片的长宽
+*/
 Camera::Camera(std::string type_, glm::vec3 eye_, glm::vec3 lookat_, glm::vec3 up_,
 	double foxy_, int w_, int h_) {
 	this->type = type_;

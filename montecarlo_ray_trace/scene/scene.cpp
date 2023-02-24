@@ -66,8 +66,9 @@ void Scene::parseFromObj() {
 void Scene::shade() {
 	LOG("开始渲染");
 	int w = camera->width, h = camera->height;
+	// tan(fovy/2)= 0.5/zpos ,zpos指屏幕空间的z值
 	float theta = camera->fovy/2;
-	
+	// 转化为弧度
 	float zpos = 0.5 / tan(theta*PI/180);
 	float imageRatio = w * 1.0 / h;
 	for (int i = 0; i < h; i++) {
@@ -83,14 +84,14 @@ void Scene::shade() {
 			for (int k = 0; k < SPP; k++) {
 					float nx,ny;
 					nx = (j + randomf() - w / 2) * 1.0 / w;
-					ny = (h / 2 - i + randomf()) * 1.0 / h;
+					ny = (h / 2 - i + randomf()) * 1.0 / h;  
 					nx *= imageRatio;
 					// NDC space to world space
 					vec3 c_dir = vec3(nx, ny, -zpos);
 					vec3 z_dir = -normalize(camera->lookat - camera->eye);
 					vec3 up_dir = normalize(camera->up);
 					vec3 x_dir = normalize(cross(up_dir,z_dir));
-					vec3 world_dir = nx * x_dir + ny * up_dir - zpos * z_dir;
+					vec3 world_dir = nx * x_dir + ny * up_dir - zpos * z_dir;// 世界坐标系中的方向
 					Ray ray;
 					ray.direction = world_dir;
 					ray.startPoint = camera->eye;
