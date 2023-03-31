@@ -8,7 +8,7 @@
 *.sln.docstates
 *.vs
 */Log.txt
-
+**/*.mayaSwatches
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
