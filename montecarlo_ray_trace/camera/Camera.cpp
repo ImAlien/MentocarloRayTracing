@@ -1,8 +1,10 @@
 #include "Camera.h"
 #include "../include/svpng.inc"
 #include <iostream>
+#include <vector>;
+#include <tinyxml2.h>
 
-
+#include <fstream>
 
 using namespace std;
 void Camera::saveImage(DataFrame* df) {
@@ -15,8 +17,48 @@ void Camera::saveImage(DataFrame* df) {
 Camera::Camera() {
 	defaultCamera();
 }
+
+void getValue(string& s, glm::vec3& v) {
+	int be = 0;
+	vector<float> vec;
+	while (be < s.size()) {
+		if (isdigit(s[be])) {
+			int ed = be;
+			while (ed < s.size() && s[ed] != ',') ed++;
+			string t = s.substr(be, ed - be);
+			vec.push_back(stof(t));
+			be = ed + 1;
+			continue;
+		}
+		be++;
+	}
+	v = { vec[0], vec[1], vec[2] };
+}
 Camera::Camera(string scenename) {
-	if (scenename == "bedroom") {
+	string xml_path = "./scenes/" + scenename + "/" + scenename + ".xml";
+	using namespace tinyxml2;
+	XMLDocument doc;
+	ifstream f(xml_path.c_str());
+	cout << f.good() << endl;
+	doc.LoadFile(xml_path.c_str());
+	XMLElement* camera = doc.FirstChildElement("root")->FirstChildElement("camera");
+	const char* type;
+	type = camera->Attribute("type");
+	this->type = type;
+	const char* eye = "failed";
+	const char* lookat = "failed";
+	const char* up = "failed";
+	eye = camera->FirstChildElement("eye")->Attribute("value");
+	lookat = camera->FirstChildElement("lookat")->Attribute("value");
+	up = camera->FirstChildElement("up")->Attribute("value");
+	string s_eye(eye), s_lookat(lookat), s_up(up);
+	getValue(s_eye, this->eye);
+	getValue(s_lookat, this->lookat);
+	getValue(s_up, this->up);
+	camera->FirstChildElement("fovy")->QueryDoubleAttribute("value", &this->fovy);
+	camera->FirstChildElement("width")->QueryIntAttribute("value", &this->width);
+	camera->FirstChildElement("height")->QueryIntAttribute("value", &this->height);
+	/*if (scenename == "bedroom") {
 		bedroomCamera();
 	}
 	else if (scenename == "veach-mis") {
@@ -27,7 +69,7 @@ Camera::Camera(string scenename) {
 	}
 	else {
 		defaultCamera();
-	}
+	}*/
 }
 /*
 type: 类型：平行投影 or 透视投影
