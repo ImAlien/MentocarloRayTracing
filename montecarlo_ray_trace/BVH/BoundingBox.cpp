@@ -10,10 +10,14 @@ BoundingBox::BoundingBox(Triangle* tr) {
 	bb.y = max(max(tr->p1.y, tr->p2.y), tr->p3.y);
 	bb.z = max(max(tr->p1.z, tr->p2.z), tr->p3.z);
 	source = tr;
+	center = aa + bb;
+	center *= 0.5;
 }
 BoundingBox::BoundingBox(glm::vec3 p1, glm::vec3 p2) {
 	aa = p1;
 	bb = p2;
+	center = aa + bb;
+	center *= 0.5;
 }
 float BoundingBox::intersectBB(Ray& r) {
 	// 1.0 / direction
