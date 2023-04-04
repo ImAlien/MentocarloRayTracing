@@ -27,6 +27,8 @@ DataFrame* DF;
 Obj* GOBJ;
 Camera* GCamera;
 Scene* GScene;
+std::map<std::string, glm::vec3> light_map;
+
 int main(void) {
 	//GOBJ = new Obj();
 	//GOBJ->loadFile("./scenes/bunny/bunny.obj");

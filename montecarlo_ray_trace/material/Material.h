@@ -5,8 +5,18 @@
 #include"../ray/Ray.h"
 #include "../main.h"
 #include <iostream>
+#include <string>
+#include <map>
+
+#ifndef MATERIAL_H
+#define MATERIAL_H
+
+extern std::map<std::string, glm::vec3> light_map;
+
 class Material {
 public:
+	
+	static void init_light_map(std::string name);
 	int type;
 	std::string name = "";
 	glm::vec3 Ka;
@@ -32,3 +42,6 @@ public:
 	}
 	float fresnelRate(Ray& ray, glm::vec3 N);
 };
+
+#endif // !MATERIAL_H
+

@@ -3,7 +3,7 @@
 #include "../main.h"
 #include "../test/Log.h"
 #include "../ray/Ray.h"
-
+#include <tinyxml2.h>
 using namespace glm;
 using namespace std;
 
@@ -38,7 +38,7 @@ Material::Material() {
 	this->Ka = glm::vec3(0, 0, 0);
 }
 bool Material::isLight() {
-	if(SCENE_NAME == "cornell-box")
+	/*if(SCENE_NAME == "cornell-box")
 		return name == "Light";
 	else if (SCENE_NAME == "veach-mis") {
 		return name.size() == 6 && name[0] == 'L';
@@ -46,14 +46,17 @@ bool Material::isLight() {
 	else if (SCENE_NAME == "bedroom") {
 		return name == "Light";
 	}
-	return false;
+	return false;*/
+	return light_map.count(name);
 }
 vec3 Material::getIntensity() {
 	if (!isLight()) {
 		LOG("ERROR: 非光源没有亮度");
 	}
+	return light_map[name];
 	if (SCENE_NAME == "cornell-box")
 		return vec3(17,12,4);
+	/*
 	else if (SCENE_NAME == "veach-mis") {
 		if (name[5] == '1') return vec3(901.803, 901.803, 901.803);
 		if (name[5] == '2') return vec3(100.0, 100.0, 100.0);
@@ -64,7 +67,7 @@ vec3 Material::getIntensity() {
 	else if (SCENE_NAME == "bedroom") {
 		return vec3(16.4648, 16.4648, 16.4648);
 	}
-	return vec3(0,0,0);
+	return vec3(0,0,0);*/
 }
 bool isSame(vec3& a, vec3& b) {
 	return fabs(a.x - b.x) < EPSILON && fabs(a.y - b.y) < EPSILON && fabs(a.z - b.z) < EPSILON;
@@ -84,4 +87,43 @@ float Material::fresnelRate(Ray& r,vec3 N) {
 	if (R0 == 0) return 1;
 	float cosine = fabs(dot(normalize(r.direction), N));
 	return R0 + (1 - R0)* powf(1 - cosine, 5);
+}
+
+vec3 getValue(string& s) {
+	int be = 0;
+	vector<float> vec;
+	while (be < s.size()) {
+		if (isdigit(s[be])) {
+			int ed = be;
+			while (ed < s.size() && s[ed] != ',') ed++;
+			string t = s.substr(be, ed - be);
+			vec.push_back(stof(t));
+			be = ed + 1;
+			continue;
+		}
+		be++;
+	}
+	return { vec[0], vec[1], vec[2] };
+}
+
+void Material::init_light_map(string name) {
+	string xml_path = "./scenes/" + name + "/" + name + ".xml";
+	using namespace tinyxml2;
+	XMLDocument doc;
+	//ifstream f(xml_path.c_str());
+	//cout << f.good() << endl;
+	doc.LoadFile(xml_path.c_str());
+	
+	XMLElement* root = doc.FirstChildElement("root");
+	for (XMLElement* currentele = root->FirstChildElement("light"); currentele; currentele = currentele->NextSiblingElement("light"))
+	{
+		XMLElement* tmpele = currentele;
+		const char* name, *radiance;
+		name = tmpele->Attribute("mtlname");
+		radiance = tmpele->Attribute("radiance");
+		string s_ra(radiance);
+		vec3 vec_ra = getValue(s_ra);
+		light_map[name] = vec_ra;
+	}
+
 }

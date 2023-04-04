@@ -20,11 +20,16 @@ Scene::Scene(string name) {
 	camera = new Camera(name);
 	cout << camera->eye;
 	cout << camera->lookat;
+	Material::init_light_map(name);
 	string pathname = "./scenes/" + name + "/" + name + ".obj";
 	obj = new Obj(pathname);
 	parseFromObj();
 	LOG("加载纹理");
 	initMaterial();
+	
+	for (auto m : light_map) {
+		cout << m.first <<" " <<  m.second << endl;
+	}
 	LOG("纹理加载完成，共" + to_string(texmap.size()) + "个纹理");
 	this->bvh = new BVH(BBs);
 	this->df = new DataFrame(camera->width, camera->height);

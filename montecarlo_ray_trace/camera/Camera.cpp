@@ -38,26 +38,47 @@ Camera::Camera(string scenename) {
 	string xml_path = "./scenes/" + scenename + "/" + scenename + ".xml";
 	using namespace tinyxml2;
 	XMLDocument doc;
-	ifstream f(xml_path.c_str());
-	cout << f.good() << endl;
+	//ifstream f(xml_path.c_str());
+	//cout << f.good() << endl;
 	doc.LoadFile(xml_path.c_str());
 	XMLElement* camera = doc.FirstChildElement("root")->FirstChildElement("camera");
 	const char* type;
 	type = camera->Attribute("type");
 	this->type = type;
-	const char* eye = "failed";
-	const char* lookat = "failed";
-	const char* up = "failed";
-	eye = camera->FirstChildElement("eye")->Attribute("value");
-	lookat = camera->FirstChildElement("lookat")->Attribute("value");
-	up = camera->FirstChildElement("up")->Attribute("value");
-	string s_eye(eye), s_lookat(lookat), s_up(up);
-	getValue(s_eye, this->eye);
-	getValue(s_lookat, this->lookat);
-	getValue(s_up, this->up);
-	camera->FirstChildElement("fovy")->QueryDoubleAttribute("value", &this->fovy);
-	camera->FirstChildElement("width")->QueryIntAttribute("value", &this->width);
-	camera->FirstChildElement("height")->QueryIntAttribute("value", &this->height);
+	const char* suc;
+	suc = camera->Attribute("fovy");
+	if (suc == NULL) {// two types xml
+		const char* eye = "failed";
+		const char* lookat = "failed";
+		const char* up = "failed";
+		eye = camera->FirstChildElement("eye")->Attribute("value");
+		lookat = camera->FirstChildElement("lookat")->Attribute("value");
+		up = camera->FirstChildElement("up")->Attribute("value");
+		string s_eye(eye), s_lookat(lookat), s_up(up);
+		getValue(s_eye, this->eye);
+		getValue(s_lookat, this->lookat);
+		getValue(s_up, this->up);
+		camera->FirstChildElement("fovy")->QueryDoubleAttribute("value", &this->fovy);
+		camera->FirstChildElement("width")->QueryIntAttribute("value", &this->width);
+		camera->FirstChildElement("height")->QueryIntAttribute("value", &this->height);
+	}
+	else {
+		camera->QueryDoubleAttribute("fovy", &this->fovy);
+		camera->QueryIntAttribute("width", &this->width);
+		camera->QueryIntAttribute("height", &this->height);
+		XMLElement* eye = camera->FirstChildElement("eye");
+		this->eye.x = eye->DoubleAttribute("x");
+		this->eye.y = eye->DoubleAttribute("y");
+		this->eye.z = eye->DoubleAttribute("z");
+		XMLElement* lookat = camera->FirstChildElement("lookat");
+		this->lookat.x = lookat->DoubleAttribute("x");
+		this->lookat.y = lookat->DoubleAttribute("y");
+		this->lookat.z = lookat->DoubleAttribute("z");
+		XMLElement* up = camera->FirstChildElement("up");
+		this->up.x = up->DoubleAttribute("x");
+		this->up.y= up->DoubleAttribute("y");
+		this->up.z = up->DoubleAttribute("z");
+	}
 	/*if (scenename == "bedroom") {
 		bedroomCamera();
 	}

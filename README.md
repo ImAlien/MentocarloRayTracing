@@ -1,6 +1,4 @@
-# CG_project
-Monte Carlo Path Trace
-
+# Monte Carlo Path Trace
 ### 编译环境
 
 Visual Studio 2017以上
@@ -21,6 +19,7 @@ https://github.com/microsoft/vcpkg
 vcpkg integrate install
 vcpkg install glm
 vcpkg install opencv
+vcpkg install tinyxml2
 ```
 
 ##### 安装完成：
@@ -35,7 +34,7 @@ vcpkg install opencv
 
 ##### 参数修改：
 
-main.h 中的SCENE_NAME自定义，注意要跟scenes文件夹中的场景文件名相一致，例如”cornell-box”, “bedroom”, “veach-mis”，
+main.h 中的SCENE_NAME自定义，注意要跟scenes文件夹中的场景文件夹名相一致，例如”cornell-box”, “bedroom”, “veach-mis”，
 
 在main.h中更改SPP的值，可以更改Sample per pixel的值。
 
