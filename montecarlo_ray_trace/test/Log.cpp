@@ -10,7 +10,11 @@ std::string curTime()
 	char tmp[64];
 	time_t ptime;
 	time(&ptime);  // time_t time (time_t* timer);
-	strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S", localtime(&ptime));
+	tm localTime;
+	if (localtime_s(&localTime, &ptime) != 0) {
+		return "unknown time";
+	}
+	strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S", &localTime);
 	return tmp;
 }
 

@@ -1,7 +1,8 @@
 
 #include "Texture.h"
-#include <opencv2/core/core.hpp>
-#include<opencv2/highgui/highgui.hpp>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+#include <cstdlib>
 #include <iostream>
 
 using namespace std;
@@ -30,34 +31,21 @@ vec3 Texture::get(int i, int j) {
 	return res;
 }
 Texture::Texture(string filename) {
-	cv::Mat image;
-	image = cv::imread(filename);
-	image = cv::imread(filename);
-	if (image.data == nullptr)//nullptr是c++11新出现的空指针常量
-	{
-		cerr << "图片文件不存在" << endl;
+	int channels = 0;
+	unsigned char* image = stbi_load(filename.c_str(), &w, &h, &channels, STBI_rgb);
+	if (image == nullptr) {
+		cerr << "Failed to load image: " << filename << " (" << stbi_failure_reason() << ")" << endl;
 		exit(1);
 	}
-	w = image.cols;
-	h = image.rows;
 	tex = new vec3[w*h];
 	for (int i = 0; i < h; i++) {
 		for (int j = 0; j < w; j++) {
-			/*float x = tr->tex1.x - (int)tr->tex1.x;
-			float y = tr->tex1.y - (int)tr->tex1.y;
-			int pic_x = image.rows * y;
-			int pic_y = image.cols * x;*/
-			//得到纹理的rbg信息
-			int intb = image.at<cv::Vec3b>(i, j)[0];
-			int intg = image.at<cv::Vec3b>(i, j)[1];
-			int intr = image.at<cv::Vec3b>(i, j)[2];
-			float b = intb * 1.0 / 255;
-			float g = intg * 1.0 / 255;
-			float r = intr * 1.0 / 255;
-			b = powf(b, 2.2);
-			g = powf(g, 2.2);
-			r = powf(r, 2.2);
+			const int offset = (i*w + j) * STBI_rgb;
+			float r = powf(image[offset] / 255.0f, 2.2f);
+			float g = powf(image[offset + 1] / 255.0f, 2.2f);
+			float b = powf(image[offset + 2] / 255.0f, 2.2f);
 			tex[i*w +j] = vec3(r, g, b);
 		}
 	}
+	stbi_image_free(image);
 }
