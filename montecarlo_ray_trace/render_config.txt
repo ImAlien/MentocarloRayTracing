@@ -6,6 +6,11 @@ spp = 128
 threads = 12
 stop_rate = 0.6
 
+# Remove isolated bright fireflies before bilateral filtering.
+outlier_removal = true
+outlier_radius = 1
+outlier_threshold = 2.5
+
 # Post-process denoising. Radius 2 is a conservative start.
 bilateral_filter = true
 bilateral_radius = 2

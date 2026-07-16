@@ -7,6 +7,9 @@ struct RenderConfig {
 	std::string sceneName = "cornell-box2";
 	int spp = 1;
 	int threads = 0;
+	bool outlierRemoval = false;
+	int outlierRadius = 1;
+	double outlierThreshold = 2.5;
 	bool bilateralFilter = false;
 	int bilateralRadius = 2;
 	double bilateralSigmaSpace = 2.0;

@@ -58,6 +58,15 @@ void applyOption(const std::string& key, const std::string& value) {
 	else if (key == "threads") {
 		g_config.threads = std::max(0, std::atoi(value.c_str()));
 	}
+	else if (key == "outlier_removal") {
+		g_config.outlierRemoval = value == "1" || value == "true" || value == "on";
+	}
+	else if (key == "outlier_radius") {
+		g_config.outlierRadius = std::max(1, std::atoi(value.c_str()));
+	}
+	else if (key == "outlier_threshold") {
+		g_config.outlierThreshold = std::max(1.001, std::atof(value.c_str()));
+	}
 	else if (key == "bilateral_filter") {
 		g_config.bilateralFilter = value == "1" || value == "true" || value == "on";
 	}
@@ -143,6 +152,15 @@ void loadRenderConfig(int argc, char* argv[]) {
 		else if (arg == "--threads" && i + 1 < argc) {
 			applyOption("threads", argv[++i]);
 		}
+		else if (arg == "--outlier-removal" && i + 1 < argc) {
+			applyOption("outlier_removal", argv[++i]);
+		}
+		else if (arg == "--outlier-radius" && i + 1 < argc) {
+			applyOption("outlier_radius", argv[++i]);
+		}
+		else if (arg == "--outlier-threshold" && i + 1 < argc) {
+			applyOption("outlier_threshold", argv[++i]);
+		}
 		else if (arg == "--bilateral-filter" && i + 1 < argc) {
 			applyOption("bilateral_filter", argv[++i]);
 		}
@@ -167,6 +185,7 @@ void loadRenderConfig(int argc, char* argv[]) {
 	std::cout << "Scene: " << g_config.sceneName
 		<< ", SPP: " << g_config.spp
 		<< ", Threads: " << (g_config.threads > 0 ? std::to_string(g_config.threads) : "auto")
+		<< ", Outlier removal: " << (g_config.outlierRemoval ? "on" : "off")
 		<< ", Bilateral: " << (g_config.bilateralFilter ? "on" : "off")
 		<< ", Scene path: " << g_config.scenePath
 		<< ", Stop rate: " << g_config.stopRate << std::endl;

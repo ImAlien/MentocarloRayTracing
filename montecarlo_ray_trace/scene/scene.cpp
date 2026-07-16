@@ -45,6 +45,10 @@ Scene::Scene(string name) {
 	finish_t = clock();
 	total_t = (double)(finish_t - start_t)/CLOCKS_PER_SEC;//将时间转换为秒
 	cout << config.spp << "SPP渲染时间时间" << total_t << "秒" << endl;
+	if (config.outlierRemoval) {
+		LOG("Applying outlier removal");
+		df->removeOutliers(config.outlierRadius, config.outlierThreshold);
+	}
 	if (config.bilateralFilter) {
 		LOG("Applying bilateral filter");
 		df->bilateralFilter(config.bilateralRadius, config.bilateralSigmaSpace, config.bilateralSigmaColor);
