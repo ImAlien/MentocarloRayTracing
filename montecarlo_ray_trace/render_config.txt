@@ -1,7 +1,7 @@
 # Runtime render settings. Change these without recompiling.
 scene = veach-mis
 scene_path = ./scenes/
-spp = 256
+spp = 128
 # 0 means auto. Set this lower than your CPU logical thread count to leave room.
 threads = 12
 stop_rate = 0.6

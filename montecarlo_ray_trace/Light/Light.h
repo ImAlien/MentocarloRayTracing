@@ -7,6 +7,7 @@ public:
 	glm::vec3 intensity;
 	glm::vec3 normal;
 	glm::vec3 p1, p2, p3;
+	Triangle* triangle;
 	float area;
 	float pdf_light;
 	Light();

@@ -8,6 +8,7 @@ void print(vec3 p) {
 	cout << "x:" <<p.x << "   y:" << p.y << "   z:" << p.z << endl;
 }
 Light::Light(Triangle* tr) {
+	triangle = tr;
 	p1 = tr->p1, p2 = tr->p2, p3 = tr->p3;
 	center = p1 + p2 + p3;
 	center /= 3;
@@ -21,11 +22,11 @@ Light::Light(Triangle* tr) {
 	normal = tr->normal;
 }
 vec3 Light::randomPoint() {
-
-	float x = randomf(), y = randomf();
-	vec3 t1 = p1 + 0.5f * (center - p1);
-	vec3 t2 = p2 + 0.5f * (center - p2);
-	vec3 t3 = p3 + 0.5f * (center - p3);
-	vec3 res =  t1 * (1.0f - x) + t2 * (x *(1.0f - y)) + t3 * x*y;
-	return res;
+	float u = randomf();
+	float v = randomf();
+	if (u + v > 1.0f) {
+		u = 1.0f - u;
+		v = 1.0f - v;
+	}
+	return p1 + u * (p2 - p1) + v * (p3 - p1);
 }

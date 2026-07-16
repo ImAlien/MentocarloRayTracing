@@ -142,93 +142,175 @@ dvec3 Scene::raysCasting(Ray& ray, int& x , int& y) {
 	hitColor /= spp;
 	return hitColor;
 }
+static float vecLength(const vec3& v) {
+	return sqrt(dot(v, v));
+}
+
+static float clamp01(float v) {
+	if (v < 0.0f) return 0.0f;
+	if (v > 1.0f) return 1.0f;
+	return v;
+}
+
+static float powerHeuristic(float pdfA, float pdfB) {
+	float a2 = pdfA * pdfA;
+	float b2 = pdfB * pdfB;
+	if (a2 + b2 <= EPSILON) return 0.0f;
+	return a2 / (a2 + b2);
+}
+
+static float specularProbability(Material& m) {
+	float kd = vecLength(m.Kd);
+	float ks = vecLength(m.Ks);
+	if (kd + ks <= EPSILON) return 0.0f;
+	return clamp01(ks / (kd + ks));
+}
+
+static vec3 evalBrdf(Material& m, Ray& outRay, const vec3& wi, vec3& N) {
+	float specProb = specularProbability(m);
+	vec3 diffuse = (1.0f - specProb) * m.Kd / PI;
+	vec3 reflectDir = normalize(reflect(outRay, N));
+	float specCos = glm::max(0.0f, dot(reflectDir, normalize(wi)));
+	vec3 specular = specProb * (m.Ns + 1.0f) * m.Ks * powf(specCos, m.Ns) / (2.0f * PI);
+	return diffuse + specular;
+}
+
+static float brdfPdf(Material& m, Ray& outRay, const vec3& wi, vec3& N) {
+	float cosTheta = glm::max(0.0f, dot(normalize(wi), N));
+	float diffusePdf = cosTheta / PI;
+	vec3 reflectDir = normalize(reflect(outRay, N));
+	float specCos = glm::max(0.0f, dot(reflectDir, normalize(wi)));
+	float specPdf = (m.Ns + 1.0f) * powf(specCos, m.Ns) / (2.0f * PI);
+	float specProb = specularProbability(m);
+	return (1.0f - specProb) * diffusePdf + specProb * specPdf;
+}
+
+static float lightPdfForTriangle(Scene* scene, Triangle* triangle, float dist2, float cosLight) {
+	if (cosLight <= EPSILON) return 0.0f;
+	for (int idx = 0; idx < (int)scene->Lights.size(); ++idx) {
+		Light& light = scene->Lights[idx];
+		if (light.triangle == triangle) {
+			int root = scene->uflights.find(idx);
+			float groupArea = scene->uflights.areas[root];
+			if (groupArea <= EPSILON) return 0.0f;
+			return dist2 / (cosLight * groupArea);
+		}
+	}
+	return 0.0f;
+}
+
+static int sampleLightIndexInGroup(Scene* scene, vector<int>& lightIndices, float groupArea) {
+	if (lightIndices.empty()) return -1;
+	float target = randomf() * groupArea;
+	float accum = 0.0f;
+	for (int idx : lightIndices) {
+		accum += scene->Lights[idx].area;
+		if (target <= accum) return idx;
+	}
+	return lightIndices.back();
+}
+
 dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
 	const float stopRate = getRenderConfig().stopRate;
-	dvec3 L_dir =  dvec3(0, 0, 0);
+	dvec3 L_dir = dvec3(0, 0, 0);
 	dvec3 L_indir = dvec3(0, 0, 0);
 	dvec3 L_emit = dvec3(0, 0, 0);
 	dvec3 L_frac = dvec3(0, 0, 0);
-	double Ct = 0, Cr = 1;
+	double Cr = 1;
 	shared_ptr<IntersectResult> hit_res = bvh->intersectBVH(ray);
 	if (hit_res && hit_res->isIntersect) {
 		Triangle* tr = hit_res->triangle;
-		Material &m = hit_res->triangle->material;
+		Material& m = tr->material;
 		vec3 cur_point = hit_res->intersectPoint;
 		m.Kd = m.isTex ? tr->getTex(hit_res, texmap[m.diffuse_texname]) : m.Kd;
 		vec3 N = tr->normal;
-		vec3 I = normalize(ray.direction);
-		if (m.isLight())  L_emit = m.getIntensity();
+
+		if (m.isLight()) {
+			return m.getIntensity();
+		}
 
 		if (m.Ni > 1) {
 			float rate = rand() / (float)(RAND_MAX);
-			if (rate > stopRate) return L_dir + L_indir + L_emit;
-			Ray rayFraction = refract(ray, N,cur_point, 1.0f, m.Ni);
+			if (rate > stopRate) return L_emit;
+			Ray rayFraction = refract(ray, N, cur_point, 1.0f, m.Ni);
 			if (rayFraction.direction != vec3(0, 0, 0)) {
 				Cr = shlick(N, normalize(ray.direction), 1.0f, m.Ni);
 				L_frac = rayCasting(rayFraction, i, j) * (1.0 - Cr);
 				L_frac /= stopRate;
 			}
 		}
-		float t1 = sqrt(dot(m.Ks, m.Ks));
-		float t2 = sqrt(dot(m.Kd, m.Kd));
-		if (t1 + t2 < EPSILON) return L_emit + L_frac;
-		float t = t1 / (t1 + t2);
-		float rate2 = randomf();
-		if (rate2 >= t) {
-			float random_area = randomf() * lights_area;
-			for (auto& lightgroup : divideLights) {
-				int x = lightgroup.first;
-				vector<int>& p_Lights = lightgroup.second;
-				int k = randomf() * (p_Lights.size() - 1);
-				float t_area = uflights.areas[x];
-				Light& l = Lights[p_Lights[k]];
-				vec3 center = l.randomPoint();
-				Ray ray2(cur_point, center);
-				shared_ptr<IntersectResult> hit_res2;
-				if (dot(ray2.direction, l.normal) < 0) {
-					hit_res2 = bvh->intersectBVH(ray2);
-					if (hit_res2 && hit_res2->isIntersect) {
-						vec3 f_r = m.Kd/PI;
-						if (isSamePoint(hit_res2->intersectPoint, center))
-							L_dir += l.intensity * f_r * fabs(dot(normalize(ray2.direction), N))
-							* fabs(dot(normalize(ray2.direction), l.normal))
-							/ dot(center - cur_point, center - cur_point)
-							* t_area;
-					}
-				}
-			}
-			float rate = rand() / (float)(RAND_MAX);
-			if (rate > stopRate) return L_dir + L_indir + L_emit;
 
-			Ray randomRay = randomHemisphere(N, cur_point);
-			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
-			if (hit_res3 && hit_res3->isIntersect) {
-				bool isLight = hit_res3->triangle->material.isLight();
-				if (!isLight ) {
-					float pdf_hemi = 1.0 / (2.0 * PI);
-					float cosine = fabs(dot(normalize(randomRay.direction), N));
-					L_indir = m.Kd * 2.0f * cosine  / stopRate;
-					L_indir *= rayCasting(randomRay, i, j);
-				}
+		float kdLen = vecLength(m.Kd);
+		float ksLen = vecLength(m.Ks);
+		if (kdLen + ksLen < EPSILON) return L_frac;
+
+		// Light sampling: sample one point on each connected light group.
+		for (auto& lightgroup : divideLights) {
+			int root = lightgroup.first;
+			vector<int>& lightIndices = lightgroup.second;
+			float groupArea = uflights.areas[root];
+			int lightIndex = sampleLightIndexInGroup(this, lightIndices, groupArea);
+			if (lightIndex < 0) continue;
+			Light& light = Lights[lightIndex];
+			vec3 lightPoint = light.randomPoint();
+			vec3 toLight = lightPoint - cur_point;
+			float dist2 = dot(toLight, toLight);
+			if (dist2 <= EPSILON) continue;
+			float dist = sqrt(dist2);
+			vec3 wi = toLight / dist;
+			float cosSurface = glm::max(0.0f, dot(wi, N));
+			float cosLight = glm::max(0.0f, dot(-wi, light.normal));
+			if (cosSurface <= EPSILON || cosLight <= EPSILON) continue;
+
+			Ray shadowRay(cur_point + wi * EPSILON, lightPoint);
+			shared_ptr<IntersectResult> shadowHit = bvh->intersectBVH(shadowRay);
+			if (shadowHit && shadowHit->isIntersect && shadowHit->triangle == light.triangle) {
+				float lightPdf = dist2 / (cosLight * groupArea);
+				float bsdfPdf = brdfPdf(m, ray, wi, N);
+				float weight = powerHeuristic(lightPdf, bsdfPdf);
+				vec3 f = evalBrdf(m, ray, wi, N);
+				L_dir += dvec3(light.intensity * f * cosSurface * weight / lightPdf);
 			}
 		}
-		else {
-			float rate = rand() / (float)(RAND_MAX);
-			if (rate > stopRate) return L_dir + L_indir + L_emit;
 
-			vec3 reflect_ray = reflect(ray, N);
-			Ray specularRay = randomSpecularSampling(reflect_ray, cur_point, m.Ns);
-			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(specularRay);
-			if (hit_res3 && hit_res3->isIntersect) {
-				vec3 f_r = m.Ks*(m.Ns + 2) / (m.Ns + 1);
-				L_indir = f_r / stopRate;
-				L_indir *= rayCasting(specularRay, i, j);
+		// BRDF sampling: cosine-weighted diffuse or Phong specular lobe.
+		float rr = rand() / (float)(RAND_MAX);
+		if (rr > stopRate) return L_dir * Cr + L_frac;
+
+		float specProb = specularProbability(m);
+		Ray sampleRay;
+		if (randomf() < specProb) {
+			vec3 reflectDir = normalize(reflect(ray, N));
+			sampleRay = randomSpecularSampling(reflectDir, cur_point, m.Ns);
+		}
+		else {
+			sampleRay = randomCosWeightSampling(N, cur_point);
+		}
+
+		vec3 wi = normalize(sampleRay.direction);
+		float cosSurface = glm::max(0.0f, dot(wi, N));
+		float pdf = brdfPdf(m, ray, wi, N);
+		if (cosSurface > EPSILON && pdf > EPSILON) {
+			sampleRay.startPoint = cur_point + wi * EPSILON;
+			shared_ptr<IntersectResult> nextHit = bvh->intersectBVH(sampleRay);
+			vec3 f = evalBrdf(m, ray, wi, N);
+			if (nextHit && nextHit->isIntersect) {
+				if (nextHit->triangle->material.isLight()) {
+					vec3 toLight = nextHit->intersectPoint - cur_point;
+					float dist2 = dot(toLight, toLight);
+					float cosLight = glm::max(0.0f, dot(-wi, nextHit->triangle->normal));
+					float lightPdf = lightPdfForTriangle(this, nextHit->triangle, dist2, cosLight);
+					float weight = powerHeuristic(pdf, lightPdf);
+					L_indir = dvec3(nextHit->triangle->material.getIntensity() * f * cosSurface * weight / pdf) / (double)stopRate;
+				}
+				else {
+					L_indir = rayCasting(sampleRay, i, j) * dvec3(f * cosSurface / pdf) / (double)stopRate;
+				}
 			}
 		}
 	}
-	return L_emit + (L_dir + L_indir)*Cr + L_frac;
-}
-void Scene::initMaterial() {
+	return L_emit + (L_dir + L_indir) * Cr + L_frac;
+}void Scene::initMaterial() {
 	for (Triangle* tr : obj->triangles) {
 		if (tr->material.diffuse_texname != "") {
 			string& textureName = tr->material.diffuse_texname;
