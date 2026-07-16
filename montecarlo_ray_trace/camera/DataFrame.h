@@ -8,5 +8,6 @@ public:
 	char* buffer;
 	DataFrame(int w, int h);
 	void inputImage();
+	void bilateralFilter(int radius, double sigmaSpace, double sigmaColor);
 	void load(std::string file);
 };

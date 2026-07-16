@@ -103,6 +103,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -137,6 +138,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -156,6 +158,7 @@
     <ClCompile Include="obj\Obj.cpp" />
     <ClCompile Include="ray\IntersectResult.cpp" />
     <ClCompile Include="ray\Ray.cpp" />
+    <ClCompile Include="RenderConfig.cpp" />
     <ClCompile Include="sample\sample.cpp" />
     <ClCompile Include="scene\scene.cpp" />
     <ClCompile Include="shape\Trangle.cpp" />
@@ -174,6 +177,7 @@
     <ClInclude Include="obj\Obj.h" />
     <ClInclude Include="ray\IntersectResult.h" />
     <ClInclude Include="ray\Ray.h" />
+    <ClInclude Include="RenderConfig.h" />
     <ClInclude Include="sample\sample.h" />
     <ClInclude Include="scene\scene.h" />
     <ClInclude Include="scene\util.h" />
@@ -182,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="include\svpng.inc" />
+    <None Include="render_config.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

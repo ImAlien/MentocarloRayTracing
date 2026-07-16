@@ -60,6 +60,9 @@
     <ClCompile Include="material\Texture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="RenderConfig.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\tiny_obj_loader.h">
@@ -113,10 +116,16 @@
     <ClInclude Include="scene\util.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="RenderConfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\svpng.inc">
       <Filter>头文件</Filter>
+    </None>
+    <None Include="render_config.txt">
+      <Filter>资源文件</Filter>
     </None>
   </ItemGroup>
 </Project>

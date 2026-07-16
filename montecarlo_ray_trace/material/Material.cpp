@@ -1,5 +1,6 @@
 
 #include"Material.h"
+#include "../RenderConfig.h"
 #include "../main.h"
 #include "../test/Log.h"
 #include "../ray/Ray.h"
@@ -54,8 +55,6 @@ vec3 Material::getIntensity() {
 		LOG("ERROR: 非光源没有亮度");
 	}
 	return light_map[name];
-	if (SCENE_NAME == "cornell-box")
-		return vec3(17,12,4);
 	/*
 	else if (SCENE_NAME == "veach-mis") {
 		if (name[5] == '1') return vec3(901.803, 901.803, 901.803);
@@ -107,14 +106,20 @@ vec3 getValue(string& s) {
 }
 
 void Material::init_light_map(string name) {
-	string xml_path = "./scenes/" + name + "/" + name + ".xml";
+	string xml_path = getSceneDir(name) + name + ".xml";
 	using namespace tinyxml2;
 	XMLDocument doc;
 	//ifstream f(xml_path.c_str());
 	//cout << f.good() << endl;
-	doc.LoadFile(xml_path.c_str());
-	
+	if (doc.LoadFile(xml_path.c_str()) != tinyxml2::XML_SUCCESS) {
+		cerr << "Failed to load material XML: " << xml_path << endl;
+		exit(1);
+	}
 	XMLElement* root = doc.FirstChildElement("root");
+	if (root == nullptr) {
+		cerr << "Material XML missing <root>: " << xml_path << endl;
+		exit(1);
+	}
 	for (XMLElement* currentele = root->FirstChildElement("light"); currentele; currentele = currentele->NextSiblingElement("light"))
 	{
 		XMLElement* tmpele = currentele;

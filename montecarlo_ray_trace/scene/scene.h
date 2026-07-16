@@ -24,6 +24,7 @@ public:
 	UnionFind uflights;
 	std::vector<float> areas;
 	float lights_area = 0, lights_pdf;// in order to use one random  light stand for  multiple lights;
+	std::string name;
 	Obj* obj;
 	BVH* bvh;
 	DataFrame* df;

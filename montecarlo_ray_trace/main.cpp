@@ -10,6 +10,7 @@
 #include"scene/scene.h"
 #include"sample/sample.h"
 #include"test/Log.h"
+#include "RenderConfig.h"
 #include "main.h"
 #include<vector>
 #include<iostream>
@@ -27,12 +28,13 @@ Camera* GCamera;
 Scene* GScene;
 std::map<std::string, glm::vec3> light_map;
 
-int main(void) {
+int main(int argc, char* argv[]) {
 	//GOBJ = new Obj();
 	//GOBJ->loadFile("./scenes/bunny/bunny.obj");
+	loadRenderConfig(argc, argv);
 	LOG("---------------------new main----------------------");
 	srand(time(NULL));
-	GScene = new Scene(SCENE_NAME);
+	GScene = new Scene(getRenderConfig().sceneName);
 	/*float sx = 0, sy = 0, sz = 0;
 	int k = 1000;
 	for (int i = 0; i < k; i++) {

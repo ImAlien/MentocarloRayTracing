@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "../RenderConfig.h"
 #include "../include/svpng.inc"
 #include <iostream>
 #include <vector>;
@@ -35,13 +36,21 @@ void getValue(string& s, glm::vec3& v) {
 	v = { vec[0], vec[1], vec[2] };
 }
 Camera::Camera(string scenename) {
-	string xml_path = "./scenes/" + scenename + "/" + scenename + ".xml";
+	string xml_path = getSceneDir(scenename) + scenename + ".xml";
 	using namespace tinyxml2;
 	XMLDocument doc;
 	//ifstream f(xml_path.c_str());
 	//cout << f.good() << endl;
-	doc.LoadFile(xml_path.c_str());
-	XMLElement* camera = doc.FirstChildElement("root")->FirstChildElement("camera");
+	if (doc.LoadFile(xml_path.c_str()) != tinyxml2::XML_SUCCESS) {
+		cerr << "Failed to load camera XML: " << xml_path << endl;
+		exit(1);
+	}
+	XMLElement* root = doc.FirstChildElement("root");
+	XMLElement* camera = root ? root->FirstChildElement("camera") : nullptr;
+	if (camera == nullptr) {
+		cerr << "Camera XML missing <camera>: " << xml_path << endl;
+		exit(1);
+	}
 	const char* type;
 	type = camera->Attribute("type");
 	this->type = type;
