@@ -12,6 +12,7 @@
 #include "../Light/Light.h"
 #include "../material/Texture.h"
 #include <map>
+#include <atomic>
 #include "util.h"
 
 class Scene {
@@ -29,9 +30,11 @@ public:
 	BVH* bvh;
 	DataFrame* df;
 	std::map<std::string, Texture*> texmap;
+	std::atomic<int> progressRows{ 0 };   // completed image rows, for the live preview
 	Scene(std::string name);
 	Scene();
 	void parseFromObj();
+	void render();   // shade + post-process + save; run on a worker thread when previewing
 	void shade();
 	glm::dvec3 raysCasting(Ray& ray, int& i, int& j);
 	glm::dvec3 rayCasting(Ray& ray, int& i, int& j);

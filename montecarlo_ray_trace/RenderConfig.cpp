@@ -85,6 +85,12 @@ void applyOption(const std::string& key, const std::string& value) {
 			g_config.stopRate = 0.6f;
 		}
 	}
+	else if (key == "preview") {
+		g_config.preview = value == "1" || value == "true" || value == "on";
+	}
+	else if (key == "preview_interval_ms") {
+		g_config.previewIntervalMs = std::max(16, std::atoi(value.c_str()));
+	}
 }
 
 bool loadConfigFile(const std::string& filename) {
@@ -176,6 +182,12 @@ void loadRenderConfig(int argc, char* argv[]) {
 		else if (arg == "--stop-rate" && i + 1 < argc) {
 			applyOption("stop_rate", argv[++i]);
 		}
+		else if (arg == "--preview" && i + 1 < argc) {
+			applyOption("preview", argv[++i]);
+		}
+		else if (arg == "--preview-interval" && i + 1 < argc) {
+			applyOption("preview_interval_ms", argv[++i]);
+		}
 		else if (!arg.empty() && arg[0] != '-') {
 			applyOption("scene", arg);
 		}
@@ -188,7 +200,8 @@ void loadRenderConfig(int argc, char* argv[]) {
 		<< ", Outlier removal: " << (g_config.outlierRemoval ? "on" : "off")
 		<< ", Bilateral: " << (g_config.bilateralFilter ? "on" : "off")
 		<< ", Scene path: " << g_config.scenePath
-		<< ", Stop rate: " << g_config.stopRate << std::endl;
+		<< ", Stop rate: " << g_config.stopRate
+		<< ", Preview: " << (g_config.preview ? "on" : "off") << std::endl;
 }
 
 std::string getSceneDir(const std::string& sceneName) {

@@ -15,6 +15,8 @@ struct RenderConfig {
 	double bilateralSigmaSpace = 2.0;
 	double bilateralSigmaColor = 0.12;
 	float stopRate = 0.6f;
+	bool preview = true;   // show a live GDI preview window while rendering
+	int previewIntervalMs = 250;   // preview refresh period (ms); larger = less impact on render speed
 };
 
 const RenderConfig& getRenderConfig();

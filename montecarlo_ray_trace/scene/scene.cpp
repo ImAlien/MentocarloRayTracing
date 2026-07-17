@@ -39,11 +39,14 @@ Scene::Scene(string name) {
 	finish_t = clock();
 	double total_t = (double)(finish_t - start_t);//将时间转换为秒
 	cout << "预处理时间" << total_t << "毫秒" << endl;
+}
+void Scene::render() {
+	const RenderConfig& config = getRenderConfig();
 	start_t = clock();
 	pre_t = clock();
 	shade();
 	finish_t = clock();
-	total_t = (double)(finish_t - start_t)/CLOCKS_PER_SEC;//将时间转换为秒
+	double total_t = (double)(finish_t - start_t)/CLOCKS_PER_SEC;//将时间转换为秒
 	cout << config.spp << "SPP渲染时间时间" << total_t << "秒" << endl;
 	if (config.outlierRemoval) {
 		LOG("Applying outlier removal");
@@ -81,6 +84,7 @@ void Scene::parseFromObj() {
 }
 void Scene::shade() {
 	LOG("开始渲染");
+	progressRows.store(0);
 	int w = camera->width, h = camera->height;
 	// tan(fovy/2)= 0.5/zpos ,zpos指屏幕空间的z值
 	float theta = camera->fovy/2;
@@ -123,6 +127,7 @@ void Scene::shade() {
 			df->data[pos + 1] = color.y;
 			df->data[pos + 2] = color.z;
 		}
+		progressRows.fetch_add(1, std::memory_order_relaxed);
 		#ifndef DEBUG
 		#pragma omp critical
 		#endif

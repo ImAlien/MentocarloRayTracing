@@ -156,6 +156,7 @@
     <ClCompile Include="material\Material.cpp" />
     <ClCompile Include="material\Texture.cpp" />
     <ClCompile Include="obj\Obj.cpp" />
+    <ClCompile Include="preview\PreviewWindow.cpp" />
     <ClCompile Include="ray\IntersectResult.cpp" />
     <ClCompile Include="ray\Ray.cpp" />
     <ClCompile Include="RenderConfig.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="material\Material.h" />
     <ClInclude Include="material\Texture.h" />
     <ClInclude Include="obj\Obj.h" />
+    <ClInclude Include="preview\PreviewWindow.h" />
     <ClInclude Include="ray\IntersectResult.h" />
     <ClInclude Include="ray\Ray.h" />
     <ClInclude Include="RenderConfig.h" />

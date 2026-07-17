@@ -1,10 +1,15 @@
 # Runtime render settings. Change these without recompiling.
 scene = veach-mis
 scene_path = ./scenes/
-spp = 128
+spp = 64
 # 0 means auto. Set this lower than your CPU logical thread count to leave room.
-threads = 12
+threads = 20
 stop_rate = 0.6
+
+# Live preview window. Turn it off for maximum render speed.
+# preview_interval_ms is how often the window repaints; larger = less slowdown.
+preview = 0
+preview_interval_ms = 250
 
 # Remove isolated bright fireflies before bilateral filtering.
 outlier_removal = true
