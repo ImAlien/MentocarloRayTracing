@@ -13,8 +13,9 @@ inline uint32_t toByte(double v) {
 }
 }
 
-PreviewWindow::PreviewWindow(DataFrame* df, std::atomic<int>* progress, const std::string& title)
-	: df_(df), progress_(progress),
+PreviewWindow::PreviewWindow(DataFrame* df, std::atomic<int>* sampleCounter, int totalSamples,
+	bool fullscreen, const std::string& title)
+	: df_(df), samples_(sampleCounter), totalSamples_(totalSamples),
 	  w_(df ? df->WIDTH : 0), h_(df ? df->HEIGHT : 0), baseTitle_(title) {
 	if (!df_ || w_ <= 0 || h_ <= 0) {
 		return;
@@ -26,7 +27,7 @@ PreviewWindow::PreviewWindow(DataFrame* df, std::atomic<int>* progress, const st
 	wc.hInstance = hInst;
 	wc.lpszClassName = kClassName;
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
+	wc.hbrBackground = reinterpret_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
 	RegisterClassA(&wc);   // harmless if the class already exists
 
 	// Start with a client area matching the image, clamped to the screen.
@@ -55,6 +56,10 @@ PreviewWindow::PreviewWindow(DataFrame* df, std::atomic<int>* progress, const st
 
 	ShowWindow(hwnd_, SW_SHOW);
 	UpdateWindow(hwnd_);
+
+	if (fullscreen) {
+		setFullscreen(true);
+	}
 }
 
 PreviewWindow::~PreviewWindow() {
@@ -62,6 +67,30 @@ PreviewWindow::~PreviewWindow() {
 		DestroyWindow(hwnd_);
 		hwnd_ = nullptr;
 	}
+}
+
+void PreviewWindow::setFullscreen(bool fs) {
+	if (!hwnd_ || fs == fullscreen_) return;
+	fullscreen_ = fs;
+	if (fs) {
+		savedStyle_ = GetWindowLong(hwnd_, GWL_STYLE);
+		GetWindowPlacement(hwnd_, &prevPlacement_);
+		MONITORINFO mi{ sizeof(MONITORINFO) };
+		GetMonitorInfo(MonitorFromWindow(hwnd_, MONITOR_DEFAULTTOPRIMARY), &mi);
+		SetWindowLong(hwnd_, GWL_STYLE, savedStyle_ & ~static_cast<LONG>(WS_OVERLAPPEDWINDOW));
+		SetWindowPos(hwnd_, HWND_TOP,
+			mi.rcMonitor.left, mi.rcMonitor.top,
+			mi.rcMonitor.right - mi.rcMonitor.left,
+			mi.rcMonitor.bottom - mi.rcMonitor.top,
+			SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+	}
+	else {
+		SetWindowLong(hwnd_, GWL_STYLE, savedStyle_ ? savedStyle_ : WS_OVERLAPPEDWINDOW);
+		SetWindowPlacement(hwnd_, &prevPlacement_);
+		SetWindowPos(hwnd_, nullptr, 0, 0, 0, 0,
+			SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+	}
+	InvalidateRect(hwnd_, nullptr, TRUE);
 }
 
 void PreviewWindow::updatePixels() {
@@ -95,10 +124,10 @@ void PreviewWindow::refresh() {
 		paint(dc);
 		ReleaseDC(hwnd_, dc);
 	}
-	if (progress_ && h_ > 0) {
-		const int done = progress_->load(std::memory_order_relaxed);
-		const int pct = std::min(100, done * 100 / h_);
-		std::string title = baseTitle_ + (pct >= 100 ? "  [done]" : "  [" + std::to_string(pct) + "%]");
+	if (samples_) {
+		const int n = samples_->load(std::memory_order_relaxed);
+		std::string title = baseTitle_ + "  spp " + std::to_string(n) + "/" + std::to_string(totalSamples_);
+		if (totalSamples_ > 0 && n >= totalSamples_) title += "  [done]";
 		SetWindowTextA(hwnd_, title.c_str());
 	}
 }
@@ -136,8 +165,16 @@ LRESULT CALLBACK PreviewWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 	case WM_ERASEBKGND:
 		return 1;   // avoid flicker; we paint the whole client area
 	case WM_KEYDOWN:
-		if (wParam == VK_ESCAPE) {
-			PostMessage(hwnd, WM_CLOSE, 0, 0);
+		if (self) {
+			if (wParam == VK_F11) {
+				self->setFullscreen(!self->fullscreen_);
+				return 0;
+			}
+			if (wParam == VK_ESCAPE) {
+				if (self->fullscreen_) self->setFullscreen(false);
+				else PostMessage(hwnd, WM_CLOSE, 0, 0);
+				return 0;
+			}
 		}
 		return 0;
 	case WM_CLOSE:

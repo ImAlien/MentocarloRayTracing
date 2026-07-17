@@ -30,12 +30,15 @@ public:
 	BVH* bvh;
 	DataFrame* df;
 	std::map<std::string, Texture*> texmap;
-	std::atomic<int> progressRows{ 0 };   // completed image rows, for the live preview
+	std::atomic<int> progressRows{ 0 };   // completed image rows in the current pass
+	std::atomic<int> sampleCount{ 0 };    // completed 1-spp passes, for the live preview title
 	Scene(std::string name);
 	Scene();
 	void parseFromObj();
-	void render();   // shade + post-process + save; run on a worker thread when previewing
-	void shade();
+	void render();       // dispatches to progressive or one-shot, then post-process + save
+	void renderPass();   // progressive: trace one sample per pixel, accumulate into df->accum
+	void resolve();      // progressive: build df->data = gamma(accum / sampleCount)
+	void shadeOneShot(); // one-shot: full spp per pixel, write df->data directly
 	glm::dvec3 raysCasting(Ray& ray, int& i, int& j);
 	glm::dvec3 rayCasting(Ray& ray, int& i, int& j);
 	void initMaterial();

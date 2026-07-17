@@ -17,6 +17,8 @@ struct RenderConfig {
 	float stopRate = 0.6f;
 	bool preview = true;   // show a live GDI preview window while rendering
 	int previewIntervalMs = 250;   // preview refresh period (ms); larger = less impact on render speed
+	bool previewFullscreen = true; // open the preview borderless fullscreen (F11 toggles, Esc exits)
+	bool progressive = true;       // true: 1spp-per-pass, image refines over time; false: one-shot full spp per pixel
 };
 
 const RenderConfig& getRenderConfig();

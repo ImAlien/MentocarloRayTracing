@@ -7,9 +7,16 @@ threads = 20
 stop_rate = 0.6
 
 # Live preview window. Turn it off for maximum render speed.
+# Rendering is progressive: 1 sample-per-pixel per pass, up to spp passes,
+# so the image starts noisy and refines each pass. The title shows spp N/total.
 # preview_interval_ms is how often the window repaints; larger = less slowdown.
-preview = 0
+# preview_fullscreen opens borderless fullscreen (F11 toggles, Esc exits).
+# progressive = 1: refine over time (1spp/pass). = 0: one-shot full spp per pixel
+#   (marginally faster to the final image; regions pop in at final quality).
+preview = 1
 preview_interval_ms = 250
+preview_fullscreen = 0
+progressive = 1
 
 # Remove isolated bright fireflies before bilateral filtering.
 outlier_removal = true

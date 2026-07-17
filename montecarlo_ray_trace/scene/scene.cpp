@@ -60,12 +60,30 @@ static std::string getCpuModel() {
 }
 void Scene::render() {
 	const RenderConfig& config = getRenderConfig();
+	const bool live = config.preview;
+	LOG("start render");
+	sampleCount.store(0);
 	start_t = clock();
 	pre_t = clock();
-	shade();
+	if (config.progressive) {
+		for (int s = 0; s < config.spp; ++s) {
+			renderPass();
+			sampleCount.fetch_add(1, std::memory_order_relaxed);
+			if (live) resolve();   // refresh display buffer so the preview refines each pass
+			finish_t = clock();
+			double pass_t = (double)(finish_t - pre_t) / CLOCKS_PER_SEC;
+			pre_t = finish_t;
+			cout << "pass " << (s + 1) << "/" << config.spp << "  " << pass_t << "s" << endl;
+		}
+		if (!live) resolve();
+	}
+	else {
+		shadeOneShot();
+		sampleCount.store(config.spp);
+	}
 	finish_t = clock();
-	double total_t = (double)(finish_t - start_t)/CLOCKS_PER_SEC;//将时间转换为秒
-	cout << config.spp << "SPP渲染时间时间" << total_t << "秒" << endl;
+	double total_t = (double)(finish_t - start_t) / CLOCKS_PER_SEC;
+	cout << config.spp << " SPP render time " << total_t << " s" << endl;
 	if (config.outlierRemoval) {
 		LOG("Applying outlier removal");
 		df->removeOutliers(config.outlierRadius, config.outlierThreshold);
@@ -75,14 +93,55 @@ void Scene::render() {
 		df->bilateralFilter(config.bilateralRadius, config.bilateralSigmaSpace, config.bilateralSigmaColor);
 	}
 	df->inputImage();
-	LOG("保存图片");
+	LOG("save image");
 	camera->saveImage(df);
 	LOG("Render done | scene=" + name
+		+ " | mode=" + (config.progressive ? std::string("progressive") : std::string("oneshot"))
 		+ " | resolution=" + std::to_string(camera->width) + "x" + std::to_string(camera->height)
 		+ " | spp=" + std::to_string(config.spp)
 		+ " | threads=" + std::to_string(omp_get_max_threads())
 		+ " | CPU=" + getCpuModel()
 		+ " | render_time=" + std::to_string(total_t) + "s");
+}
+void Scene::shadeOneShot() {
+	progressRows.store(0);
+	int w = camera->width, h = camera->height;
+	float theta = camera->fovy / 2;
+	float zpos = 0.5 / tan(theta * PI / 180);
+	float imageRatio = w * 1.0 / h;
+	const int spp = getRenderConfig().spp;
+	#ifndef DEBUG
+	if (getRenderConfig().threads > 0) {
+		omp_set_num_threads(getRenderConfig().threads);
+	}
+	#pragma omp parallel for schedule(dynamic)
+	#endif
+	for (int i = 0; i < h; i++) {
+		for (int j = 0; j < w; j++) {
+			dvec3 color = dvec3(0, 0, 0);
+			for (int k = 0; k < spp; k++) {
+				float nx, ny;
+				nx = (j + randomf() - w / 2) * 1.0 / w;
+				ny = (h / 2 - i + randomf()) * 1.0 / h;
+				nx *= imageRatio;
+				vec3 z_dir = -normalize(camera->lookat - camera->eye);
+				vec3 up_dir = normalize(camera->up);
+				vec3 x_dir = normalize(cross(up_dir, z_dir));
+				vec3 world_dir = nx * x_dir + ny * up_dir - zpos * z_dir;
+				Ray ray;
+				ray.direction = world_dir;
+				ray.startPoint = camera->eye;
+				ray.direction_inv = glm::vec3(1.0 / ray.direction.x, 1.0 / ray.direction.y, 1.0 / ray.direction.z);
+				color += rayCasting(ray, i, j) / (1.0 * spp);
+			}
+			gamma(color);
+			int pos = (i * w + j) * 3;
+			df->data[pos] = color.x;
+			df->data[pos + 1] = color.y;
+			df->data[pos + 2] = color.z;
+		}
+		progressRows.fetch_add(1, std::memory_order_relaxed);
+	}
 }
 void Scene::parseFromObj() {
 	for (Triangle* tr : obj->triangles) {
@@ -106,16 +165,12 @@ void Scene::parseFromObj() {
 		cout << x << ' ' << uflights.areas[x] << ' ' << endl;
 	}
 }
-void Scene::shade() {
-	LOG("开始渲染");
+void Scene::renderPass() {
 	progressRows.store(0);
 	int w = camera->width, h = camera->height;
-	// tan(fovy/2)= 0.5/zpos ,zpos指屏幕空间的z值
-	float theta = camera->fovy/2;
-	// 转化为弧度
-	float zpos = 0.5 / tan(theta*PI/180);
+	float theta = camera->fovy / 2;
+	float zpos = 0.5 / tan(theta * PI / 180);
 	float imageRatio = w * 1.0 / h;
-	const int spp = getRenderConfig().spp;
 	#ifndef DEBUG
 	if (getRenderConfig().threads > 0) {
 		omp_set_num_threads(getRenderConfig().threads);
@@ -124,47 +179,42 @@ void Scene::shade() {
 	#endif
 	for (int i = 0; i < h; i++) {
 		for (int j = 0; j < w; j++) {
-			// Screen space to NDC space
-			//float ny = 1.0f - (i + 0.5f) * 2 / h ;
-			//float nx = 1.0f - (j + 0.5f) * 2 / w ;
-			dvec3 color = dvec3(0,0,0);
-			for (int k = 0; k < spp; k++) {
-					float nx,ny;
-					nx = (j + randomf() - w / 2) * 1.0 / w;
-					ny = (h / 2 - i + randomf()) * 1.0 / h;  
-					nx *= imageRatio;
-					// NDC space to world space
-					vec3 c_dir = vec3(nx, ny, -zpos);
-					vec3 z_dir = -normalize(camera->lookat - camera->eye);
-					vec3 up_dir = normalize(camera->up);
-					vec3 x_dir = normalize(cross(up_dir,z_dir));
-					vec3 world_dir = nx * x_dir + ny * up_dir - zpos * z_dir;// 世界坐标系中的方向
-					Ray ray;
-					ray.direction = world_dir;
-					ray.startPoint = camera->eye;
-					ray.direction_inv = glm::vec3(1.0 / ray.direction.x, 1.0 / ray.direction.y, 1.0 / ray.direction.z);
-					color += rayCasting(ray, i , j)/(1.0*spp);
-			}
-			gamma(color);
-			int pos = (i*w + j) * 3;
-			df->data[pos] = color.x;
-			df->data[pos + 1] = color.y;
-			df->data[pos + 2] = color.z;
+			float nx, ny;
+			nx = (j + randomf() - w / 2) * 1.0 / w;
+			ny = (h / 2 - i + randomf()) * 1.0 / h;
+			nx *= imageRatio;
+			vec3 z_dir = -normalize(camera->lookat - camera->eye);
+			vec3 up_dir = normalize(camera->up);
+			vec3 x_dir = normalize(cross(up_dir, z_dir));
+			vec3 world_dir = nx * x_dir + ny * up_dir - zpos * z_dir;
+			Ray ray;
+			ray.direction = world_dir;
+			ray.startPoint = camera->eye;
+			ray.direction_inv = glm::vec3(1.0 / ray.direction.x, 1.0 / ray.direction.y, 1.0 / ray.direction.z);
+			dvec3 c = rayCasting(ray, i, j);
+			int pos = (i * w + j) * 3;
+			df->accum[pos] += c.x;
+			df->accum[pos + 1] += c.y;
+			df->accum[pos + 2] += c.z;
 		}
 		progressRows.fetch_add(1, std::memory_order_relaxed);
-		#ifndef DEBUG
-		#pragma omp critical
-		#endif
-		{
-			if (i % 10 == 0) {
-				finish_t = clock();
-				double total_t = (double)(finish_t - pre_t)/CLOCKS_PER_SEC;//将时间转换为秒
-				cout  << i << "行像素时间" << total_t << "秒" << endl;
-				pre_t = finish_t;
-			}
-		}
 	}
-	LOG("渲染完成");
+}
+void Scene::resolve() {
+	int w = camera->width, h = camera->height;
+	int n = sampleCount.load(std::memory_order_relaxed);
+	if (n <= 0) n = 1;
+	double inv = 1.0 / n;
+	#ifndef DEBUG
+	#pragma omp parallel for schedule(static)
+	#endif
+	for (int p = 0; p < w * h; p++) {
+		dvec3 color(df->accum[p * 3] * inv, df->accum[p * 3 + 1] * inv, df->accum[p * 3 + 2] * inv);
+		gamma(color);
+		df->data[p * 3] = color.x;
+		df->data[p * 3 + 1] = color.y;
+		df->data[p * 3 + 2] = color.z;
+	}
 }
 dvec3 Scene::raysCasting(Ray& ray, int& x , int& y) {
 	dvec3 hitColor = dvec3(0, 0, 0);

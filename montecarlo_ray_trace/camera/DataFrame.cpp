@@ -13,6 +13,8 @@ DataFrame::DataFrame(int w, int h) {
 	this->WIDTH = w;
 	this->data = new double[w*h*3];
 	this->image = new unsigned char[w*h * 3];
+	this->accum = new double[w*h*3];
+	std::memset(accum, 0, sizeof(double) * WIDTH * HEIGHT * 3);
 	std::memset(data, 0.0, sizeof(double) * WIDTH * HEIGHT * 3);
 }
 void DataFrame::inputImage() {

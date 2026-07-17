@@ -111,3 +111,71 @@
 2026-07-17 16:54:36   Applying bilateral filter
 2026-07-17 16:54:37   保存图片
 2026-07-17 16:54:37   Render done | scene=cornell-box | resolution=1024x1024 | spp=1 | threads=20 | CPU=Intel(R) Core(TM) i7-14700KF | render_time=149.947000s
+2026-07-17 16:59:51   ---------------------new main----------------------
+2026-07-17 16:59:51   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-17 16:59:51   3812个面片加载完成
+2026-07-17 16:59:51   Lights number:3800
+2026-07-17 16:59:51   加载纹理
+2026-07-17 16:59:51   纹理加载完成，共0个纹理
+2026-07-17 16:59:51   开始创建BVH
+2026-07-17 16:59:51   BVH创建完成
+2026-07-17 16:59:51   开始渲染
+2026-07-17 17:00:29   渲染完成
+2026-07-17 17:00:29   Applying outlier removal
+2026-07-17 17:00:29   Applying bilateral filter
+2026-07-17 17:00:29   保存图片
+2026-07-17 17:00:29   Render done | scene=veach-mis | resolution=1200x900 | spp=64 | threads=20 | CPU=Intel(R) Core(TM) i7-14700KF | render_time=37.379000s
+2026-07-17 17:01:32   ---------------------new main----------------------
+2026-07-17 17:01:32   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-17 17:01:32   3812个面片加载完成
+2026-07-17 17:01:32   Lights number:3800
+2026-07-17 17:01:32   加载纹理
+2026-07-17 17:01:32   纹理加载完成，共0个纹理
+2026-07-17 17:01:32   开始创建BVH
+2026-07-17 17:01:32   BVH创建完成
+2026-07-17 17:01:32   开始渲染
+2026-07-17 17:02:48   渲染完成
+2026-07-17 17:02:48   Applying outlier removal
+2026-07-17 17:02:48   Applying bilateral filter
+2026-07-17 17:02:48   保存图片
+2026-07-17 17:02:48   Render done | scene=veach-mis | resolution=1200x900 | spp=128 | threads=20 | CPU=Intel(R) Core(TM) i7-14700KF | render_time=76.215000s
+2026-07-17 17:05:11   ---------------------new main----------------------
+2026-07-17 17:05:11   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-17 17:05:11   3812个面片加载完成
+2026-07-17 17:05:11   Lights number:3800
+2026-07-17 17:05:11   加载纹理
+2026-07-17 17:05:11   纹理加载完成，共0个纹理
+2026-07-17 17:05:11   开始创建BVH
+2026-07-17 17:05:11   BVH创建完成
+2026-07-17 17:05:11   开始渲染
+2026-07-17 17:05:48   渲染完成
+2026-07-17 17:05:48   Applying outlier removal
+2026-07-17 17:05:48   Applying bilateral filter
+2026-07-17 17:05:48   保存图片
+2026-07-17 17:05:48   Render done | scene=veach-mis | resolution=1200x900 | spp=64 | threads=20 | CPU=Intel(R) Core(TM) i7-14700KF | render_time=36.520000s
+2026-07-17 17:18:57   ---------------------new main----------------------
+2026-07-17 17:18:57   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-17 17:18:57   3812个面片加载完成
+2026-07-17 17:18:57   Lights number:3800
+2026-07-17 17:18:57   加载纹理
+2026-07-17 17:18:57   纹理加载完成，共0个纹理
+2026-07-17 17:18:57   开始创建BVH
+2026-07-17 17:18:57   BVH创建完成
+2026-07-17 17:18:57   start render
+2026-07-17 17:19:34   Applying outlier removal
+2026-07-17 17:19:34   Applying bilateral filter
+2026-07-17 17:19:34   save image
+2026-07-17 17:19:34   Render done | scene=veach-mis | resolution=1200x900 | spp=64 | threads=20 | CPU=Intel(R) Core(TM) i7-14700KF | render_time=36.953000s
+2026-07-17 17:26:20   ---------------------new main----------------------
+2026-07-17 17:26:20   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-17 17:26:20   3812个面片加载完成
+2026-07-17 17:26:20   Lights number:3800
+2026-07-17 17:26:20   加载纹理
+2026-07-17 17:26:20   纹理加载完成，共0个纹理
+2026-07-17 17:26:20   开始创建BVH
+2026-07-17 17:26:20   BVH创建完成
+2026-07-17 17:26:20   start render
+2026-07-17 17:26:57   Applying outlier removal
+2026-07-17 17:26:57   Applying bilateral filter
+2026-07-17 17:26:57   save image
+2026-07-17 17:26:57   Render done | scene=veach-mis | mode=progressive | resolution=1200x900 | spp=64 | threads=20 | CPU=Intel(R) Core(TM) i7-14700KF | render_time=37.149000s

@@ -1,9 +1,10 @@
 #pragma once
 
 // A lightweight Win32 + GDI live preview window. It reads the renderer's
-// DataFrame (double RGB, gamma-corrected, [0,1]) and blits it to a resizable
-// window at whatever cadence the caller drives. No external dependencies:
-// gdi32/user32 are linked by MSBuild by default.
+// DataFrame (double RGB, gamma-corrected, [0,1]) and blits it to the window at
+// whatever cadence the caller drives. No external dependencies: gdi32/user32
+// are linked by MSBuild by default. Supports borderless fullscreen (F11 toggles,
+// Esc exits fullscreen or closes the window).
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -22,9 +23,11 @@
 
 class PreviewWindow {
 public:
-	// progress: optional pointer to the renderer's completed-row counter, used
-	// to show a percentage in the title bar. May be null.
-	PreviewWindow(DataFrame* df, std::atomic<int>* progress, const std::string& title);
+	// sampleCounter: optional pointer to the renderer's completed-pass (spp) counter,
+	//   shown in the title as "spp N/total". May be null.
+	// fullscreen: start in borderless fullscreen.
+	PreviewWindow(DataFrame* df, std::atomic<int>* sampleCounter, int totalSamples,
+		bool fullscreen, const std::string& title);
 	~PreviewWindow();
 
 	bool valid() const { return hwnd_ != nullptr; }
@@ -40,15 +43,20 @@ public:
 private:
 	void updatePixels();
 	void paint(HDC dc);
+	void setFullscreen(bool fs);
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	DataFrame* df_;
-	std::atomic<int>* progress_;
+	std::atomic<int>* samples_;
+	int totalSamples_;
 	int w_;
 	int h_;
 	HWND hwnd_ = nullptr;
 	BITMAPINFO bmi_{};
 	std::vector<uint32_t> pixels_;   // 0x00RRGGBB, top-down
 	bool closed_ = false;
+	bool fullscreen_ = false;
+	WINDOWPLACEMENT prevPlacement_{ sizeof(WINDOWPLACEMENT) };
+	DWORD savedStyle_ = 0;
 	std::string baseTitle_;
 };

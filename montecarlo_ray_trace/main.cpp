@@ -48,7 +48,8 @@ int main(int argc, char* argv[]) {
 	}
 	cout << sx/k << ' ' << sy/k << ' ' << sz/k << endl;*/
 	if (getRenderConfig().preview) {
-		PreviewWindow window(GScene->df, &GScene->progressRows,
+		PreviewWindow window(GScene->df, &GScene->sampleCount, getRenderConfig().spp,
+			getRenderConfig().previewFullscreen,
 			"MonteCarlo Ray Trace - " + getRenderConfig().sceneName);
 		if (window.valid()) {
 			std::atomic<bool> done{ false };

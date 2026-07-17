@@ -91,6 +91,12 @@ void applyOption(const std::string& key, const std::string& value) {
 	else if (key == "preview_interval_ms") {
 		g_config.previewIntervalMs = std::max(16, std::atoi(value.c_str()));
 	}
+	else if (key == "preview_fullscreen") {
+		g_config.previewFullscreen = value == "1" || value == "true" || value == "on";
+	}
+	else if (key == "progressive") {
+		g_config.progressive = value == "1" || value == "true" || value == "on";
+	}
 }
 
 bool loadConfigFile(const std::string& filename) {
@@ -187,6 +193,12 @@ void loadRenderConfig(int argc, char* argv[]) {
 		}
 		else if (arg == "--preview-interval" && i + 1 < argc) {
 			applyOption("preview_interval_ms", argv[++i]);
+		}
+		else if (arg == "--preview-fullscreen" && i + 1 < argc) {
+			applyOption("preview_fullscreen", argv[++i]);
+		}
+		else if (arg == "--progressive" && i + 1 < argc) {
+			applyOption("progressive", argv[++i]);
 		}
 		else if (!arg.empty() && arg[0] != '-') {
 			applyOption("scene", arg);
