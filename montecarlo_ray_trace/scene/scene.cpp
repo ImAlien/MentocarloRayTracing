@@ -10,6 +10,8 @@
 #include <set>
 //#define DEBUG
 #include<map>
+#include <intrin.h>
+#include <cstring>
 using namespace std;
 using namespace glm;
 bool flag = true;
@@ -40,6 +42,22 @@ Scene::Scene(string name) {
 	double total_t = (double)(finish_t - start_t);//将时间转换为秒
 	cout << "预处理时间" << total_t << "毫秒" << endl;
 }
+static std::string getCpuModel() {
+	int cpui[4] = { 0 };
+	char brand[0x40] = { 0 };
+	__cpuid(cpui, 0x80000000);
+	unsigned int maxExt = (unsigned int)cpui[0];
+	if (maxExt >= 0x80000004) {
+		for (unsigned int id = 0x80000002; id <= 0x80000004; ++id) {
+			__cpuidex(cpui, (int)id, 0);
+			memcpy(brand + (id - 0x80000002) * 16, cpui, sizeof(cpui));
+		}
+		std::string name(brand);
+		size_t end = name.find_last_not_of(" \t");
+		return end == std::string::npos ? name : name.substr(0, end + 1);
+	}
+	return "unknown CPU";
+}
 void Scene::render() {
 	const RenderConfig& config = getRenderConfig();
 	start_t = clock();
@@ -59,6 +77,12 @@ void Scene::render() {
 	df->inputImage();
 	LOG("保存图片");
 	camera->saveImage(df);
+	LOG("Render done | scene=" + name
+		+ " | resolution=" + std::to_string(camera->width) + "x" + std::to_string(camera->height)
+		+ " | spp=" + std::to_string(config.spp)
+		+ " | threads=" + std::to_string(omp_get_max_threads())
+		+ " | CPU=" + getCpuModel()
+		+ " | render_time=" + std::to_string(total_t) + "s");
 }
 void Scene::parseFromObj() {
 	for (Triangle* tr : obj->triangles) {
