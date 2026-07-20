@@ -42,7 +42,9 @@ public:
 	void renderCoarse(int step);  // interactive: 1 spp on a step x step grid, write df->data blocks
 	void resetAccum();            // clear df->accum and sampleCount (on camera move)
 	glm::dvec3 raysCasting(Ray& ray, int& i, int& j);
-	glm::dvec3 rayCasting(Ray& ray, int& i, int& j);
+	glm::dvec3 rayCasting(Ray& ray, int& i, int& j);          // dispatches on config.useMis
+	glm::dvec3 rayCastingMis(Ray& ray, int& i, int& j);       // MIS integrator (light + BRDF sampling)
+	glm::dvec3 rayCastingLegacy(Ray& ray, int& i, int& j);    // pre-MIS split diffuse/specular estimator
 	void initMaterial();
 	void addLight(Triangle* tr);
 	void initufLights();

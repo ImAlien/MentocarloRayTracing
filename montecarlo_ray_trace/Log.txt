@@ -261,3 +261,20 @@
 2026-07-20 15:43:15   开始创建BVH
 2026-07-20 15:43:15   BVH创建完成
 2026-07-20 15:45:31   interactive session ended, snapshot saved to image.png
+2026-07-20 17:03:28   ---------------------new main----------------------
+2026-07-20 17:03:28   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-20 17:03:28   3812个面片加载完成
+2026-07-20 17:03:28   Lights number:3800
+2026-07-20 17:03:28   加载纹理
+2026-07-20 17:03:29   纹理加载完成，共0个纹理
+2026-07-20 17:03:29   开始创建BVH
+2026-07-20 17:03:29   BVH创建完成
+2026-07-20 17:03:29   interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, right-click/[ ] switch scene, Esc=quit
+2026-07-20 17:03:33   加载./scenes/cornell-box/cornell-box.obj模型中...
+2026-07-20 17:03:33   15056个面片加载完成
+2026-07-20 17:03:33   Lights number:2
+2026-07-20 17:03:33   加载纹理
+2026-07-20 17:03:33   纹理加载完成，共1个纹理
+2026-07-20 17:03:33   开始创建BVH
+2026-07-20 17:03:33   BVH创建完成
+2026-07-20 17:04:17   interactive session ended, snapshot saved to image.png

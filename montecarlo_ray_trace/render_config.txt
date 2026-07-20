@@ -6,6 +6,12 @@ spp = 64
 threads = 20
 stop_rate = 0.6
 
+# Integrator selection.
+#   use_mis = 1: MIS path tracer (light + BRDF sampling, power heuristic) - default
+#   use_mis = 0: original pre-MIS rendering equation (split diffuse/specular,
+#                unweighted NEE + uniform-hemisphere indirect)
+use_mis = 0
+
 # Live preview window. Turn it off for maximum render speed.
 # Rendering is progressive: 1 sample-per-pixel per pass, up to spp passes,
 # so the image starts noisy and refines each pass. The title shows spp N/total.

@@ -15,6 +15,7 @@ struct RenderConfig {
 	double bilateralSigmaSpace = 2.0;
 	double bilateralSigmaColor = 0.12;
 	float stopRate = 0.6f;
+	bool useMis = true;    // true: MIS integrator (light + BRDF sampling); false: legacy split diffuse/specular estimator
 	bool preview = true;   // show a live GDI preview window while rendering
 	int previewIntervalMs = 250;   // preview refresh period (ms); larger = less impact on render speed
 	bool previewFullscreen = true; // open the preview borderless fullscreen (F11 toggles, Esc exits)

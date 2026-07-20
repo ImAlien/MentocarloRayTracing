@@ -337,6 +337,11 @@ static int sampleLightIndexInGroup(Scene* scene, vector<int>& lightIndices, floa
 }
 
 dvec3 Scene::rayCasting(Ray& ray, int& i, int& j) {
+	// Runtime integrator switch. use_mis = 0 (render_config.txt) or
+	// --use-mis 0 restores the original pre-MIS rendering equation.
+	return getRenderConfig().useMis ? rayCastingMis(ray, i, j) : rayCastingLegacy(ray, i, j);
+}
+dvec3 Scene::rayCastingMis(Ray& ray, int& i, int& j) {
 	const float stopRate = getRenderConfig().stopRate;
 	dvec3 L_dir = dvec3(0, 0, 0);
 	dvec3 L_indir = dvec3(0, 0, 0);
@@ -496,4 +501,97 @@ void Scene::initufLights() {
 	for (auto m : divideLights) {
 		cout <<"¹âÔ´:" <<m.first << ' ' << m.second.size() << endl;
 	}
+}
+
+// ------------------------------------------------------------------
+// Legacy integrator: the original pre-MIS rendering equation (commit
+// 6f41c3c's parent). Selected when use_mis = 0. Splits diffuse/specular
+// by a random draw, does unweighted next-event estimation for direct
+// light and uniform-hemisphere sampling for indirect.
+// ------------------------------------------------------------------
+dvec3 Scene::rayCastingLegacy(Ray& ray, int& i, int& j) {
+	const float stopRate = getRenderConfig().stopRate;
+	dvec3 L_dir = dvec3(0, 0, 0);
+	dvec3 L_indir = dvec3(0, 0, 0);
+	dvec3 L_emit = dvec3(0, 0, 0);
+	dvec3 L_frac = dvec3(0, 0, 0);
+	double Ct = 0, Cr = 1;
+	shared_ptr<IntersectResult> hit_res = bvh->intersectBVH(ray);
+	if (hit_res && hit_res->isIntersect) {
+		Triangle* tr = hit_res->triangle;
+		Material &m = hit_res->triangle->material;
+		vec3 cur_point = hit_res->intersectPoint;
+		m.Kd = m.isTex ? tr->getTex(hit_res, texmap[m.diffuse_texname]) : m.Kd;
+		vec3 N = tr->normal;
+		vec3 I = normalize(ray.direction);
+		if (m.isLight())  L_emit = m.getIntensity();
+
+		if (m.Ni > 1) {
+			float rate = rand() / (float)(RAND_MAX);
+			if (rate > stopRate) return L_dir + L_indir + L_emit;
+			Ray rayFraction = refract(ray, N, cur_point, 1.0f, m.Ni);
+			if (rayFraction.direction != vec3(0, 0, 0)) {
+				Cr = shlick(N, normalize(ray.direction), 1.0f, m.Ni);
+				L_frac = rayCastingLegacy(rayFraction, i, j) * (1.0 - Cr);
+				L_frac /= stopRate;
+			}
+		}
+		float t1 = sqrt(dot(m.Ks, m.Ks));
+		float t2 = sqrt(dot(m.Kd, m.Kd));
+		if (t1 + t2 < EPSILON) return L_emit + L_frac;
+		float t = t1 / (t1 + t2);
+		float rate2 = randomf();
+		if (rate2 >= t) {
+			float random_area = randomf() * lights_area;
+			for (auto& lightgroup : divideLights) {
+				int x = lightgroup.first;
+				vector<int>& p_Lights = lightgroup.second;
+				int k = randomf() * (p_Lights.size() - 1);
+				float t_area = uflights.areas[x];
+				Light& l = Lights[p_Lights[k]];
+				vec3 center = l.randomPoint();
+				Ray ray2(cur_point, center);
+				shared_ptr<IntersectResult> hit_res2;
+				if (dot(ray2.direction, l.normal) < 0) {
+					hit_res2 = bvh->intersectBVH(ray2);
+					if (hit_res2 && hit_res2->isIntersect) {
+						vec3 f_r = m.Kd / PI;
+						if (isSamePoint(hit_res2->intersectPoint, center))
+							L_dir += l.intensity * f_r * fabs(dot(normalize(ray2.direction), N))
+							* fabs(dot(normalize(ray2.direction), l.normal))
+							/ dot(center - cur_point, center - cur_point)
+							* t_area;
+					}
+				}
+			}
+			float rate = rand() / (float)(RAND_MAX);
+			if (rate > stopRate) return L_dir + L_indir + L_emit;
+
+			Ray randomRay = randomHemisphere(N, cur_point);
+			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(randomRay);
+			if (hit_res3 && hit_res3->isIntersect) {
+				bool isLight = hit_res3->triangle->material.isLight();
+				if (!isLight) {
+					float pdf_hemi = 1.0 / (2.0 * PI);
+					float cosine = fabs(dot(normalize(randomRay.direction), N));
+					L_indir = m.Kd * 2.0f * cosine / stopRate;
+					L_indir *= rayCastingLegacy(randomRay, i, j);
+				}
+			}
+		}
+		else {
+			float rate = rand() / (float)(RAND_MAX);
+			if (rate > stopRate) return L_dir + L_indir + L_emit;
+
+			vec3 reflect_ray = reflect(ray, N);
+			Ray specularRay = randomSpecularSampling(reflect_ray, cur_point, m.Ns);
+			shared_ptr<IntersectResult> hit_res3 = bvh->intersectBVH(specularRay);
+			if (hit_res3 && hit_res3->isIntersect) {
+				vec3 f_r = m.Ks * (m.Ns + 2) / (m.Ns + 1);
+				L_indir = f_r / stopRate;
+				L_indir *= rayCastingLegacy(specularRay, i, j);
+			}
+		}
+	}
+	return L_emit + (L_dir + L_indir) * Cr + L_frac;
 }
