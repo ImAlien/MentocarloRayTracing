@@ -1,5 +1,6 @@
 #include "PreviewWindow.h"
 
+#include <windowsx.h>   // GET_X_LPARAM / GET_Y_LPARAM
 #include <algorithm>
 
 namespace {
@@ -56,6 +57,8 @@ PreviewWindow::PreviewWindow(DataFrame* df, std::atomic<int>* sampleCounter, int
 
 	ShowWindow(hwnd_, SW_SHOW);
 	UpdateWindow(hwnd_);
+	SetForegroundWindow(hwnd_);
+	SetFocus(hwnd_);   // so WASD / mouse reach the window in interactive mode
 
 	if (fullscreen) {
 		setFullscreen(true);
@@ -126,8 +129,11 @@ void PreviewWindow::refresh() {
 	}
 	if (samples_) {
 		const int n = samples_->load(std::memory_order_relaxed);
-		std::string title = baseTitle_ + "  spp " + std::to_string(n) + "/" + std::to_string(totalSamples_);
-		if (totalSamples_ > 0 && n >= totalSamples_) title += "  [done]";
+		std::string title = baseTitle_ + "  spp " + std::to_string(n);
+		if (totalSamples_ > 0) {
+			title += "/" + std::to_string(totalSamples_);
+			if (n >= totalSamples_) title += "  [done]";
+		}
 		SetWindowTextA(hwnd_, title.c_str());
 	}
 }
@@ -166,6 +172,7 @@ LRESULT CALLBACK PreviewWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 		return 1;   // avoid flicker; we paint the whole client area
 	case WM_KEYDOWN:
 		if (self) {
+			if (wParam < 256) self->keys_[wParam] = true;
 			if (wParam == VK_F11) {
 				self->setFullscreen(!self->fullscreen_);
 				return 0;
@@ -176,6 +183,40 @@ LRESULT CALLBACK PreviewWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 				return 0;
 			}
 		}
+		return 0;
+	case WM_KEYUP:
+		if (self && wParam < 256) self->keys_[wParam] = false;
+		return 0;
+	case WM_LBUTTONDOWN:
+		if (self) {
+			self->dragging_ = true;
+			self->lastMouseX_ = GET_X_LPARAM(lParam);
+			self->lastMouseY_ = GET_Y_LPARAM(lParam);
+			SetCapture(hwnd);
+		}
+		return 0;
+	case WM_MOUSEMOVE:
+		if (self && self->dragging_) {
+			const int x = GET_X_LPARAM(lParam);
+			const int y = GET_Y_LPARAM(lParam);
+			self->mouseDx_ += x - self->lastMouseX_;
+			self->mouseDy_ += y - self->lastMouseY_;
+			self->lastMouseX_ = x;
+			self->lastMouseY_ = y;
+		}
+		return 0;
+	case WM_LBUTTONUP:
+		if (self) {
+			self->dragging_ = false;
+			ReleaseCapture();
+		}
+		return 0;
+	case WM_MOUSEWHEEL:
+		if (self) self->wheel_ += GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+		return 0;
+	case WM_KILLFOCUS:
+		// drop held keys so we don't "stick" moving when focus is lost
+		if (self) { for (int i = 0; i < 256; ++i) self->keys_[i] = false; self->dragging_ = false; }
 		return 0;
 	case WM_CLOSE:
 		if (self) self->closed_ = true;

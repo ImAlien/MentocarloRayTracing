@@ -97,6 +97,20 @@ void applyOption(const std::string& key, const std::string& value) {
 	else if (key == "progressive") {
 		g_config.progressive = value == "1" || value == "true" || value == "on";
 	}
+	else if (key == "interactive") {
+		g_config.interactive = value == "1" || value == "true" || value == "on";
+	}
+	else if (key == "move_speed") {
+		g_config.moveSpeed = static_cast<float>(std::atof(value.c_str()));
+		if (g_config.moveSpeed <= 0.0f) g_config.moveSpeed = 1.0f;
+	}
+	else if (key == "mouse_sensitivity") {
+		g_config.mouseSensitivity = static_cast<float>(std::atof(value.c_str()));
+		if (g_config.mouseSensitivity <= 0.0f) g_config.mouseSensitivity = 1.0f;
+	}
+	else if (key == "moving_downscale") {
+		g_config.movingDownscale = std::max(1, std::atoi(value.c_str()));
+	}
 }
 
 bool loadConfigFile(const std::string& filename) {
@@ -199,6 +213,18 @@ void loadRenderConfig(int argc, char* argv[]) {
 		}
 		else if (arg == "--progressive" && i + 1 < argc) {
 			applyOption("progressive", argv[++i]);
+		}
+		else if (arg == "--interactive" && i + 1 < argc) {
+			applyOption("interactive", argv[++i]);
+		}
+		else if (arg == "--move-speed" && i + 1 < argc) {
+			applyOption("move_speed", argv[++i]);
+		}
+		else if (arg == "--mouse-sensitivity" && i + 1 < argc) {
+			applyOption("mouse_sensitivity", argv[++i]);
+		}
+		else if (arg == "--moving-downscale" && i + 1 < argc) {
+			applyOption("moving_downscale", argv[++i]);
 		}
 		else if (!arg.empty() && arg[0] != '-') {
 			applyOption("scene", arg);

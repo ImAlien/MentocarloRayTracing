@@ -40,6 +40,13 @@ public:
 
 	bool closed() const { return closed_; }
 
+	// --- input for interactive camera control ---
+	bool keyDown(int vk) const { return vk >= 0 && vk < 256 && keys_[vk]; }
+	// Accumulated left-drag mouse movement since the last call (resets to 0).
+	void consumeMouseDelta(int& dx, int& dy) { dx = mouseDx_; dy = mouseDy_; mouseDx_ = 0; mouseDy_ = 0; }
+	// Accumulated wheel notches since the last call (resets to 0).
+	int consumeWheel() { int w = wheel_; wheel_ = 0; return w; }
+
 private:
 	void updatePixels();
 	void paint(HDC dc);
@@ -59,4 +66,13 @@ private:
 	WINDOWPLACEMENT prevPlacement_{ sizeof(WINDOWPLACEMENT) };
 	DWORD savedStyle_ = 0;
 	std::string baseTitle_;
+
+	// input state
+	bool keys_[256] = {};
+	bool dragging_ = false;
+	int mouseDx_ = 0;
+	int mouseDy_ = 0;
+	int lastMouseX_ = 0;
+	int lastMouseY_ = 0;
+	int wheel_ = 0;
 };

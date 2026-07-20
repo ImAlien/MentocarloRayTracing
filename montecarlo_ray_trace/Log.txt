@@ -179,3 +179,45 @@
 2026-07-17 17:26:57   Applying bilateral filter
 2026-07-17 17:26:57   save image
 2026-07-17 17:26:57   Render done | scene=veach-mis | mode=progressive | resolution=1200x900 | spp=64 | threads=20 | CPU=Intel(R) Core(TM) i7-14700KF | render_time=37.149000s
+2026-07-20 13:49:03   ---------------------new main----------------------
+2026-07-20 13:49:03   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-20 13:49:03   3812个面片加载完成
+2026-07-20 13:49:03   Lights number:3800
+2026-07-20 13:49:04   加载纹理
+2026-07-20 13:49:04   纹理加载完成，共0个纹理
+2026-07-20 13:49:04   开始创建BVH
+2026-07-20 13:49:04   BVH创建完成
+2026-07-20 13:49:04   start render
+2026-07-20 13:49:40   Applying outlier removal
+2026-07-20 13:49:41   Applying bilateral filter
+2026-07-20 13:49:41   save image
+2026-07-20 13:49:41   Render done | scene=veach-mis | mode=progressive | resolution=1200x900 | spp=64 | threads=20 | CPU=Intel(R) Core(TM) i7-14700KF | render_time=36.875000s
+2026-07-20 15:04:46   ---------------------new main----------------------
+2026-07-20 15:04:46   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-20 15:04:46   3812个面片加载完成
+2026-07-20 15:04:46   Lights number:3800
+2026-07-20 15:04:46   加载纹理
+2026-07-20 15:04:46   纹理加载完成，共0个纹理
+2026-07-20 15:04:46   开始创建BVH
+2026-07-20 15:04:46   BVH创建完成
+2026-07-20 15:04:46   start render
+2026-07-20 15:05:21   ---------------------new main----------------------
+2026-07-20 15:05:21   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-20 15:05:21   3812个面片加载完成
+2026-07-20 15:05:21   Lights number:3800
+2026-07-20 15:05:21   加载纹理
+2026-07-20 15:05:21   纹理加载完成，共0个纹理
+2026-07-20 15:05:21   开始创建BVH
+2026-07-20 15:05:21   BVH创建完成
+2026-07-20 15:05:21   interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, F11=fullscreen, Esc=quit
+2026-07-20 15:14:28   interactive session ended, snapshot saved to image.png
+2026-07-20 15:16:10   ---------------------new main----------------------
+2026-07-20 15:16:10   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-20 15:16:10   3812个面片加载完成
+2026-07-20 15:16:10   Lights number:3800
+2026-07-20 15:16:10   加载纹理
+2026-07-20 15:16:10   纹理加载完成，共0个纹理
+2026-07-20 15:16:10   开始创建BVH
+2026-07-20 15:16:10   BVH创建完成
+2026-07-20 15:16:10   interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, F11=fullscreen, Esc=quit
+2026-07-20 15:17:53   interactive session ended, snapshot saved to image.png

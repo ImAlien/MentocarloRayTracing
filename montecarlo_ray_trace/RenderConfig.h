@@ -19,6 +19,10 @@ struct RenderConfig {
 	int previewIntervalMs = 250;   // preview refresh period (ms); larger = less impact on render speed
 	bool previewFullscreen = true; // open the preview borderless fullscreen (F11 toggles, Esc exits)
 	bool progressive = true;       // true: 1spp-per-pass, image refines over time; false: one-shot full spp per pixel
+	bool interactive = false;      // free-fly camera preview (WASD + mouse look); runs until the window is closed
+	float moveSpeed = 1.0f;        // camera translation-speed multiplier (mouse wheel adjusts it live)
+	float mouseSensitivity = 1.0f; // camera look-sensitivity multiplier
+	int movingDownscale = 4;       // render at 1/N resolution while the camera is moving, full res once still
 };
 
 const RenderConfig& getRenderConfig();

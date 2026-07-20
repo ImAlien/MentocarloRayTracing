@@ -216,6 +216,49 @@ void Scene::resolve() {
 		df->data[p * 3 + 2] = color.z;
 	}
 }
+void Scene::resetAccum() {
+	std::memset(df->accum, 0, sizeof(double) * df->WIDTH * df->HEIGHT * 3);
+	sampleCount.store(0);
+}
+void Scene::renderCoarse(int step) {
+	if (step < 1) step = 1;
+	int w = camera->width, h = camera->height;
+	float theta = camera->fovy / 2;
+	float zpos = 0.5 / tan(theta * PI / 180);
+	float imageRatio = w * 1.0 / h;
+	vec3 z_dir = -normalize(camera->lookat - camera->eye);
+	vec3 up_dir = normalize(camera->up);
+	vec3 x_dir = normalize(cross(up_dir, z_dir));
+	#ifndef DEBUG
+	if (getRenderConfig().threads > 0) {
+		omp_set_num_threads(getRenderConfig().threads);
+	}
+	#pragma omp parallel for schedule(dynamic)
+	#endif
+	for (int i = 0; i < h; i += step) {
+		for (int j = 0; j < w; j += step) {
+			float nx = (j + 0.5f - w / 2) * 1.0 / w;
+			float ny = (h / 2 - i - 0.5f) * 1.0 / h;
+			nx *= imageRatio;
+			vec3 world_dir = nx * x_dir + ny * up_dir - zpos * z_dir;
+			Ray ray;
+			ray.direction = world_dir;
+			ray.startPoint = camera->eye;
+			ray.direction_inv = glm::vec3(1.0 / ray.direction.x, 1.0 / ray.direction.y, 1.0 / ray.direction.z);
+			int ci = i, cj = j;
+			dvec3 color = rayCasting(ray, ci, cj);
+			gamma(color);
+			for (int bi = i; bi < i + step && bi < h; ++bi) {
+				for (int bj = j; bj < j + step && bj < w; ++bj) {
+					int pos = (bi * w + bj) * 3;
+					df->data[pos] = color.x;
+					df->data[pos + 1] = color.y;
+					df->data[pos + 2] = color.z;
+				}
+			}
+		}
+	}
+}
 dvec3 Scene::raysCasting(Ray& ray, int& x , int& y) {
 	dvec3 hitColor = dvec3(0, 0, 0);
 	const int spp = getRenderConfig().spp;

@@ -39,6 +39,8 @@ public:
 	void renderPass();   // progressive: trace one sample per pixel, accumulate into df->accum
 	void resolve();      // progressive: build df->data = gamma(accum / sampleCount)
 	void shadeOneShot(); // one-shot: full spp per pixel, write df->data directly
+	void renderCoarse(int step);  // interactive: 1 spp on a step x step grid, write df->data blocks
+	void resetAccum();            // clear df->accum and sampleCount (on camera move)
 	glm::dvec3 raysCasting(Ray& ray, int& i, int& j);
 	glm::dvec3 rayCasting(Ray& ray, int& i, int& j);
 	void initMaterial();

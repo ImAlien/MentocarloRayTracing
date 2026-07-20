@@ -18,6 +18,15 @@ preview_interval_ms = 250
 preview_fullscreen = 0
 progressive = 1
 
+# Interactive free-fly camera (needs preview = 1). WASD move, Space/Ctrl up-down,
+# drag mouse to look, wheel adjusts speed, F11 fullscreen, Esc quit. While moving
+# it renders at 1/moving_downscale resolution, then refines to full res once still.
+# On quit the current frame is saved to image.png.
+interactive = 1
+move_speed = 1.0
+mouse_sensitivity = 1.0
+moving_downscale = 4
+
 # Remove isolated bright fireflies before bilateral filtering.
 outlier_removal = true
 outlier_radius = 1
