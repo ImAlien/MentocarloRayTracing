@@ -40,6 +40,24 @@ static glm::vec3 rotateAround(const glm::vec3& v, float angle, const glm::vec3& 
 	return v * c + glm::cross(axis, v) * s + axis * glm::dot(axis, v) * (1.0f - c);
 }
 
+static std::vector<std::string> listScenes() {
+	std::vector<std::string> out;
+	std::string base = getRenderConfig().scenePath;   // ends with a separator
+	std::string pattern = base + "*";
+	WIN32_FIND_DATAA fd;
+	HANDLE h = FindFirstFileA(pattern.c_str(), &fd);
+	if (h == INVALID_HANDLE_VALUE) return out;
+	do {
+		if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) continue;
+		std::string name = fd.cFileName;
+		if (name == "." || name == "..") continue;
+		std::string xml = base + name + "/" + name + ".xml";
+		if (GetFileAttributesA(xml.c_str()) != INVALID_FILE_ATTRIBUTES) out.push_back(name);
+	} while (FindNextFileA(h, &fd));
+	FindClose(h);
+	return out;
+}
+
 static void runInteractive(PreviewWindow& window) {
 	Camera* cam = GScene->camera;
 	const RenderConfig& cfg = getRenderConfig();
@@ -52,9 +70,31 @@ static void runInteractive(PreviewWindow& window) {
 	bool converged = false;
 
 	GScene->resetAccum();
-	LOG("interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, F11=fullscreen, Esc=quit");
+	LOG("interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, right-click/[ ] switch scene, Esc=quit");
+	std::vector<std::string> scenes = listScenes();
+	int curIdx = -1;
+	for (size_t i = 0; i < scenes.size(); ++i) if (scenes[i] == GScene->name) { curIdx = (int)i; break; }
+	window.setScenes(scenes, curIdx);
 
 	while (window.pump()) {
+		int sceneReq = window.consumeSceneRequest();
+		if (sceneReq >= 0 && sceneReq < (int)scenes.size() && sceneReq != curIdx) {
+			window.showStatus("Loading " + scenes[sceneReq] + " ...");
+			light_map.clear();
+			GScene = new Scene(scenes[sceneReq]);   // note: previous scene intentionally left (Scene has no dtor)
+			curIdx = sceneReq;
+			cam = GScene->camera;
+			worldUp = glm::normalize(cam->up);
+			sceneScale = glm::length(cam->lookat - cam->eye);
+			if (sceneScale < 1e-3f) sceneScale = 1.0f;
+			window.setSource(GScene->df);
+			window.setSampleCounter(&GScene->sampleCount);
+			window.onSceneChanged(curIdx, std::string("MCRT [WASD/drag to fly] - ") + scenes[sceneReq]);
+			GScene->resetAccum();
+			needFull = true;
+			converged = false;
+			continue;
+		}
 		glm::vec3 fwd = glm::normalize(cam->lookat - cam->eye);
 		glm::vec3 right = glm::normalize(glm::cross(fwd, worldUp));
 		bool moved = false;

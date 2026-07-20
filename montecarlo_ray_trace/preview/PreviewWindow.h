@@ -47,10 +47,23 @@ public:
 	// Accumulated wheel notches since the last call (resets to 0).
 	int consumeWheel() { int w = wheel_; wheel_ = 0; return w; }
 
+	// --- scene switching (right-click menu + [ ] keys) ---
+	void setScenes(const std::vector<std::string>& names, int current) { scenes_ = names; currentScene_ = current; }
+	// Returns the scene index the user asked to switch to since the last call, or -1.
+	int consumeSceneRequest() { int r = pendingScene_; pendingScene_ = -1; return r; }
+	// Rebind to a different scene's framebuffer (dimensions may differ).
+	void setSource(DataFrame* df);
+	void setSampleCounter(std::atomic<int>* c) { samples_ = c; }
+	// Update the checked scene + title text after a switch completes.
+	void onSceneChanged(int idx, const std::string& baseTitle) { currentScene_ = idx; baseTitle_ = baseTitle; }
+	// Show an immediate status string in the title (e.g. while a scene loads).
+	void showStatus(const std::string& text);
+
 private:
 	void updatePixels();
 	void paint(HDC dc);
 	void setFullscreen(bool fs);
+	void showSceneMenu();
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	DataFrame* df_;
@@ -75,4 +88,9 @@ private:
 	int lastMouseX_ = 0;
 	int lastMouseY_ = 0;
 	int wheel_ = 0;
+
+	// scene switching
+	std::vector<std::string> scenes_;
+	int currentScene_ = -1;
+	int pendingScene_ = -1;
 };

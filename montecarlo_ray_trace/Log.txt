@@ -221,3 +221,43 @@
 2026-07-20 15:16:10   BVH创建完成
 2026-07-20 15:16:10   interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, F11=fullscreen, Esc=quit
 2026-07-20 15:17:53   interactive session ended, snapshot saved to image.png
+2026-07-20 15:42:03   ---------------------new main----------------------
+2026-07-20 15:42:03   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-20 15:42:03   3812个面片加载完成
+2026-07-20 15:42:03   Lights number:3800
+2026-07-20 15:42:03   加载纹理
+2026-07-20 15:42:03   纹理加载完成，共0个纹理
+2026-07-20 15:42:03   开始创建BVH
+2026-07-20 15:42:03   BVH创建完成
+2026-07-20 15:42:03   interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, right-click/[ ] switch scene, Esc=quit
+2026-07-20 15:42:06   加载./scenes/bedroom/bedroom.obj模型中...
+2026-07-20 15:42:06   441754个面片加载完成
+2026-07-20 15:42:06   Lights number:4
+2026-07-20 15:42:06   加载纹理
+2026-07-20 15:42:07   纹理加载完成，共4个纹理
+2026-07-20 15:42:07   开始创建BVH
+2026-07-20 15:42:07   BVH创建完成
+2026-07-20 15:42:32   加载./scenes/cornell-box2/cornell-box2.obj模型中...
+2026-07-20 15:42:32   234945个面片加载完成
+2026-07-20 15:42:32   Lights number:4
+2026-07-20 15:42:32   加载纹理
+2026-07-20 15:42:32   纹理加载完成，共0个纹理
+2026-07-20 15:42:32   开始创建BVH
+2026-07-20 15:42:32   BVH创建完成
+2026-07-20 15:43:11   ---------------------new main----------------------
+2026-07-20 15:43:11   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-20 15:43:11   3812个面片加载完成
+2026-07-20 15:43:11   Lights number:3800
+2026-07-20 15:43:11   加载纹理
+2026-07-20 15:43:11   纹理加载完成，共0个纹理
+2026-07-20 15:43:11   开始创建BVH
+2026-07-20 15:43:11   BVH创建完成
+2026-07-20 15:43:11   interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, right-click/[ ] switch scene, Esc=quit
+2026-07-20 15:43:15   加载./scenes/staircase/staircase.obj模型中...
+2026-07-20 15:43:15   31407个面片加载完成
+2026-07-20 15:43:15   Lights number:0
+2026-07-20 15:43:15   加载纹理
+2026-07-20 15:43:15   纹理加载完成，共3个纹理
+2026-07-20 15:43:15   开始创建BVH
+2026-07-20 15:43:15   BVH创建完成
+2026-07-20 15:45:31   interactive session ended, snapshot saved to image.png

@@ -5,6 +5,7 @@
 
 namespace {
 const char* kClassName = "MCRT_PreviewWindow";
+const int kSceneMenuBase = 1000;   // WM_COMMAND ids for the scene popup menu
 
 inline uint32_t toByte(double v) {
 	int x = static_cast<int>(v * 255.0 + 0.5);
@@ -96,6 +97,50 @@ void PreviewWindow::setFullscreen(bool fs) {
 	InvalidateRect(hwnd_, nullptr, TRUE);
 }
 
+void PreviewWindow::setSource(DataFrame* df) {
+	if (!df) return;
+	df_ = df;
+	w_ = df->WIDTH;
+	h_ = df->HEIGHT;
+	bmi_.bmiHeader.biWidth = w_;
+	bmi_.bmiHeader.biHeight = -h_;
+	pixels_.assign(static_cast<size_t>(w_) * h_, 0u);
+	if (hwnd_ && !fullscreen_) {
+		const int scrW = GetSystemMetrics(SM_CXSCREEN);
+		const int scrH = GetSystemMetrics(SM_CYSCREEN);
+		const int cw = std::min(w_, std::max(320, scrW - 120));
+		const int ch = std::min(h_, std::max(240, scrH - 160));
+		RECT r{ 0, 0, cw, ch };
+		AdjustWindowRect(&r, static_cast<DWORD>(GetWindowLong(hwnd_, GWL_STYLE)), FALSE);
+		SetWindowPos(hwnd_, nullptr, 0, 0, r.right - r.left, r.bottom - r.top,
+			SWP_NOMOVE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+	}
+	if (hwnd_) InvalidateRect(hwnd_, nullptr, TRUE);
+}
+
+void PreviewWindow::showStatus(const std::string& text) {
+	if (hwnd_) {
+		SetWindowTextA(hwnd_, text.c_str());
+		UpdateWindow(hwnd_);
+	}
+}
+
+void PreviewWindow::showSceneMenu() {
+	if (!hwnd_ || scenes_.empty()) return;
+	HMENU menu = CreatePopupMenu();
+	if (!menu) return;
+	for (size_t i = 0; i < scenes_.size(); ++i) {
+		UINT flags = MF_STRING;
+		if (static_cast<int>(i) == currentScene_) flags |= MF_CHECKED;
+		AppendMenuA(menu, flags, kSceneMenuBase + static_cast<UINT>(i), scenes_[i].c_str());
+	}
+	POINT pt;
+	GetCursorPos(&pt);
+	SetForegroundWindow(hwnd_);
+	TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_LEFTBUTTON, pt.x, pt.y, 0, hwnd_, nullptr);
+	DestroyMenu(menu);
+}
+
 void PreviewWindow::updatePixels() {
 	const double* s = df_->data;
 	const size_t n = static_cast<size_t>(w_) * h_;
@@ -182,6 +227,17 @@ LRESULT CALLBACK PreviewWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 				else PostMessage(hwnd, WM_CLOSE, 0, 0);
 				return 0;
 			}
+			if (!self->scenes_.empty()) {
+				const int count = static_cast<int>(self->scenes_.size());
+				if (wParam == VK_OEM_4) {   // '[' previous scene
+					self->pendingScene_ = (self->currentScene_ - 1 + count) % count;
+					return 0;
+				}
+				if (wParam == VK_OEM_6) {   // ']' next scene
+					self->pendingScene_ = (self->currentScene_ + 1) % count;
+					return 0;
+				}
+			}
 		}
 		return 0;
 	case WM_KEYUP:
@@ -213,6 +269,15 @@ LRESULT CALLBACK PreviewWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 		return 0;
 	case WM_MOUSEWHEEL:
 		if (self) self->wheel_ += GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+		return 0;
+	case WM_RBUTTONUP:
+		if (self) self->showSceneMenu();
+		return 0;
+	case WM_COMMAND:
+		if (self) {
+			const int idx = LOWORD(wParam) - kSceneMenuBase;
+			if (idx >= 0 && idx < static_cast<int>(self->scenes_.size())) self->pendingScene_ = idx;
+		}
 		return 0;
 	case WM_KILLFOCUS:
 		// drop held keys so we don't "stick" moving when focus is lost
