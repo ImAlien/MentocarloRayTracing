@@ -83,7 +83,8 @@ static void runInteractive(PreviewWindow& window) {
 				time_t t = time(nullptr);
 				struct tm lt; localtime_s(&lt, &t);
 				char ts[32]; strftime(ts, sizeof(ts), "%Y%m%d_%H%M%S", &lt);
-				std::string fname = GScene->name + "_" + std::to_string(spp) + "_" + ts + ".png";
+				CreateDirectoryA("temp", nullptr);   // ensure output folder exists (no-op if present)
+				std::string fname = std::string("temp/") + GScene->name + "_" + std::to_string(spp) + "_" + ts + ".png";
 				GScene->camera->saveImage(GScene->df, fname);
 				window.showStatus("Saved " + fname);
 				LOG("interactive snapshot saved: " + fname);

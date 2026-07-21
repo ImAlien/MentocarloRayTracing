@@ -356,3 +356,13 @@
 2026-07-21 10:48:01   开始创建BVH
 2026-07-21 10:48:01   BVH创建完成
 2026-07-21 10:48:15   interactive session ended, snapshot saved to image.png
+2026-07-21 16:50:35   ---------------------new main----------------------
+2026-07-21 16:50:35   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-21 16:50:35   3812个面片加载完成
+2026-07-21 16:50:35   Lights number:3800
+2026-07-21 16:50:35   加载纹理
+2026-07-21 16:50:36   纹理加载完成，共0个纹理
+2026-07-21 16:50:36   开始创建BVH
+2026-07-21 16:50:36   BVH创建完成
+2026-07-21 16:50:36   interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, right-click/[ ] switch scene, P=save, Esc=quit
+2026-07-21 16:51:44   interactive session ended, snapshot saved to image.png
