@@ -227,6 +227,10 @@ LRESULT CALLBACK PreviewWindow::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 				else PostMessage(hwnd, WM_CLOSE, 0, 0);
 				return 0;
 			}
+			if (wParam == 'P' && !(lParam & (1 << 30))) {   // 'P' saves a snapshot (once per key press)
+				self->saveRequest_ = true;
+				return 0;
+			}
 			if (!self->scenes_.empty()) {
 				const int count = static_cast<int>(self->scenes_.size());
 				if (wParam == VK_OEM_4) {   // '[' previous scene

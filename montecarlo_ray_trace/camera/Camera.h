@@ -22,7 +22,8 @@ public:
 	void cornellboxCamera();
 	void veachmisCamera();
 	void defaultCamera();
-	void saveImage(DataFrame* df);
+	void saveImage(DataFrame* df);                                 // writes image.png
+	void saveImage(DataFrame* df, const std::string& filename);    // writes an arbitrary path
 	void simpleProcess(DataFrame* df);
 	friend std::ostream &operator<<(std::ostream& os, const Camera& r) {
 		os << "[eye:" << r.eye << "lookat" << r.lookat <<  "]\n";

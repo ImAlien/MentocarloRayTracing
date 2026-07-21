@@ -278,3 +278,81 @@
 2026-07-20 17:03:33   开始创建BVH
 2026-07-20 17:03:33   BVH创建完成
 2026-07-20 17:04:17   interactive session ended, snapshot saved to image.png
+2026-07-20 17:15:11   ---------------------new main----------------------
+2026-07-20 17:15:11   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-20 17:15:11   3812个面片加载完成
+2026-07-20 17:15:11   Lights number:3800
+2026-07-20 17:15:11   加载纹理
+2026-07-20 17:15:11   纹理加载完成，共0个纹理
+2026-07-20 17:15:11   开始创建BVH
+2026-07-20 17:15:11   BVH创建完成
+2026-07-20 17:15:11   interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, right-click/[ ] switch scene, P=save, Esc=quit
+2026-07-20 17:15:22   interactive snapshot saved: veach-mis_28_20260720_171522.png
+2026-07-20 17:16:02   加载./scenes/cornell-box/cornell-box.obj模型中...
+2026-07-20 17:16:02   15056个面片加载完成
+2026-07-20 17:16:02   Lights number:2
+2026-07-20 17:16:02   加载纹理
+2026-07-20 17:16:02   纹理加载完成，共1个纹理
+2026-07-20 17:16:02   开始创建BVH
+2026-07-20 17:16:02   BVH创建完成
+2026-07-20 17:16:38   interactive snapshot saved: cornell-box_64_20260720_171638.png
+2026-07-20 17:16:45   interactive session ended, snapshot saved to image.png
+2026-07-20 17:16:50   ---------------------new main----------------------
+2026-07-20 17:16:50   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-20 17:16:50   3812个面片加载完成
+2026-07-20 17:16:50   Lights number:3800
+2026-07-20 17:16:50   加载纹理
+2026-07-20 17:16:50   纹理加载完成，共0个纹理
+2026-07-20 17:16:50   开始创建BVH
+2026-07-20 17:16:50   BVH创建完成
+2026-07-20 17:16:50   interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, right-click/[ ] switch scene, P=save, Esc=quit
+2026-07-20 17:16:55   加载./scenes/cornell-box/cornell-box.obj模型中...
+2026-07-20 17:16:55   15056个面片加载完成
+2026-07-20 17:16:55   Lights number:2
+2026-07-20 17:16:55   加载纹理
+2026-07-20 17:16:55   纹理加载完成，共1个纹理
+2026-07-20 17:16:55   开始创建BVH
+2026-07-20 17:16:55   BVH创建完成
+2026-07-20 17:17:49   interactive snapshot saved: cornell-box_64_20260720_171749.png
+2026-07-20 17:17:50   interactive session ended, snapshot saved to image.png
+2026-07-20 17:24:19   ---------------------new main----------------------
+2026-07-20 17:24:19   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-20 17:24:19   3812个面片加载完成
+2026-07-20 17:24:19   Lights number:3800
+2026-07-20 17:24:19   加载纹理
+2026-07-20 17:24:19   纹理加载完成，共0个纹理
+2026-07-20 17:24:19   开始创建BVH
+2026-07-20 17:24:19   BVH创建完成
+2026-07-20 17:24:19   interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, right-click/[ ] switch scene, P=save, Esc=quit
+2026-07-20 17:24:23   加载./scenes/cornell-box/cornell-box.obj模型中...
+2026-07-20 17:24:23   15056个面片加载完成
+2026-07-20 17:24:23   Lights number:2
+2026-07-20 17:24:23   加载纹理
+2026-07-20 17:24:24   纹理加载完成，共1个纹理
+2026-07-20 17:24:24   开始创建BVH
+2026-07-20 17:24:24   BVH创建完成
+2026-07-20 17:24:56   interactive session ended, snapshot saved to image.png
+2026-07-21 10:47:17   ---------------------new main----------------------
+2026-07-21 10:47:17   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-21 10:47:17   3812个面片加载完成
+2026-07-21 10:47:17   Lights number:3800
+2026-07-21 10:47:17   加载纹理
+2026-07-21 10:47:17   纹理加载完成，共0个纹理
+2026-07-21 10:47:17   开始创建BVH
+2026-07-21 10:47:17   BVH创建完成
+2026-07-21 10:47:17   interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, right-click/[ ] switch scene, P=save, Esc=quit
+2026-07-21 10:47:21   加载./scenes/cornell-box/cornell-box.obj模型中...
+2026-07-21 10:47:21   15056个面片加载完成
+2026-07-21 10:47:21   Lights number:2
+2026-07-21 10:47:21   加载纹理
+2026-07-21 10:47:21   纹理加载完成，共1个纹理
+2026-07-21 10:47:21   开始创建BVH
+2026-07-21 10:47:21   BVH创建完成
+2026-07-21 10:48:01   加载./scenes/veach-mis/veach-mis.obj模型中...
+2026-07-21 10:48:01   3812个面片加载完成
+2026-07-21 10:48:01   Lights number:3800
+2026-07-21 10:48:01   加载纹理
+2026-07-21 10:48:01   纹理加载完成，共0个纹理
+2026-07-21 10:48:01   开始创建BVH
+2026-07-21 10:48:01   BVH创建完成
+2026-07-21 10:48:15   interactive session ended, snapshot saved to image.png

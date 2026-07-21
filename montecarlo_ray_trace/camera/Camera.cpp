@@ -9,8 +9,11 @@
 
 using namespace std;
 void Camera::saveImage(DataFrame* df) {
+	saveImage(df, "image.png");
+}
+void Camera::saveImage(DataFrame* df, const std::string& filename) {
 	FILE* fp;
-	fopen_s(&fp, "image.png", "wb");
+	fopen_s(&fp, filename.c_str(), "wb");
 	//simpleProcess(df);
 	svpng(fp, df->WIDTH, df->HEIGHT, df->image, 0);
 	fclose(fp);

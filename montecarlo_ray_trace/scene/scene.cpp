@@ -375,6 +375,12 @@ dvec3 Scene::rayCastingMis(Ray& ray, int& i, int& j) {
 		float ksLen = vecLength(m.Ks);
 		if (kdLen + ksLen < EPSILON) return L_frac;
 
+		// Pure-diffuse surfaces: NEE (light sampling) alone is a complete,
+		// low-variance estimator of direct light, so use it only (weight 1,
+		// skip the BRDF-hit-light term) - the clean legacy behavior, still
+		// unbiased. Keep full MIS only for glossy/specular materials (Ks>0).
+		bool misDirect = specularProbability(m) > EPSILON;
+
 		// Light sampling: sample one point on each connected light group.
 		for (auto& lightgroup : divideLights) {
 			int root = lightgroup.first;
@@ -398,15 +404,23 @@ dvec3 Scene::rayCastingMis(Ray& ray, int& i, int& j) {
 			if (shadowHit && shadowHit->isIntersect && shadowHit->triangle == light.triangle) {
 				float lightPdf = dist2 / (cosLight * groupArea);
 				float bsdfPdf = brdfPdf(m, ray, wi, N);
-				float weight = powerHeuristic(lightPdf, bsdfPdf);
+				float weight = misDirect ? powerHeuristic(lightPdf, bsdfPdf) : 1.0f;
 				vec3 f = evalBrdf(m, ray, wi, N);
 				L_dir += dvec3(light.intensity * f * cosSurface * weight / lightPdf);
 			}
 		}
 
 		// BRDF sampling: cosine-weighted diffuse or Phong specular lobe.
-		float rr = rand() / (float)(RAND_MAX);
-		if (rr > stopRate) return L_dir * Cr + L_frac;
+		// Russian roulette continuation probability = surface albedo, so that
+		// throughput/pcont <= 1 and path energy never grows. A fixed rate below
+		// the albedo (stop_rate 0.6 vs Kd 0.8 walls) grows throughput ~1.33x per
+		// surviving bounce; MIS then catches those amplified light hits as the
+		// fireflies you see, while the legacy path discards indirect light hits.
+		float pcont = glm::max(m.Kd.x, glm::max(m.Kd.y, m.Kd.z));
+		pcont = glm::max(pcont, glm::max(m.Ks.x, glm::max(m.Ks.y, m.Ks.z)));
+		pcont = glm::clamp(pcont, 0.0f, 0.95f);
+		float rr = randomf();
+		if (pcont <= EPSILON || rr >= pcont) return L_dir * Cr + L_frac;
 
 		float specProb = specularProbability(m);
 		Ray sampleRay;
@@ -427,15 +441,17 @@ dvec3 Scene::rayCastingMis(Ray& ray, int& i, int& j) {
 			vec3 f = evalBrdf(m, ray, wi, N);
 			if (nextHit && nextHit->isIntersect) {
 				if (nextHit->triangle->material.isLight()) {
-					vec3 toLight = nextHit->intersectPoint - cur_point;
-					float dist2 = dot(toLight, toLight);
-					float cosLight = glm::max(0.0f, dot(-wi, nextHit->triangle->normal));
-					float lightPdf = lightPdfForTriangle(this, nextHit->triangle, dist2, cosLight);
-					float weight = powerHeuristic(pdf, lightPdf);
-					L_indir = dvec3(nextHit->triangle->material.getIntensity() * f * cosSurface * weight / pdf) / (double)stopRate;
+					if (misDirect) {   // pure diffuse: NEE already handled direct light; skip (avoid double count)
+						vec3 toLight = nextHit->intersectPoint - cur_point;
+						float dist2 = dot(toLight, toLight);
+						float cosLight = glm::max(0.0f, dot(-wi, nextHit->triangle->normal));
+						float lightPdf = lightPdfForTriangle(this, nextHit->triangle, dist2, cosLight);
+						float weight = powerHeuristic(pdf, lightPdf);
+						L_indir = dvec3(nextHit->triangle->material.getIntensity() * f * cosSurface * weight / pdf) / (double)pcont;
+					}
 				}
 				else {
-					L_indir = rayCasting(sampleRay, i, j) * dvec3(f * cosSurface / pdf) / (double)stopRate;
+					L_indir = rayCasting(sampleRay, i, j) * dvec3(f * cosSurface / pdf) / (double)pcont;
 				}
 			}
 		}

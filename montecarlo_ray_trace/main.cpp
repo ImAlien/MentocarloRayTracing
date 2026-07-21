@@ -70,13 +70,24 @@ static void runInteractive(PreviewWindow& window) {
 	bool converged = false;
 
 	GScene->resetAccum();
-	LOG("interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, right-click/[ ] switch scene, Esc=quit");
+	LOG("interactive: WASD move, Space/Ctrl up-down, drag to look, wheel=speed, right-click/[ ] switch scene, P=save, Esc=quit");
 	std::vector<std::string> scenes = listScenes();
 	int curIdx = -1;
 	for (size_t i = 0; i < scenes.size(); ++i) if (scenes[i] == GScene->name) { curIdx = (int)i; break; }
 	window.setScenes(scenes, curIdx);
 
 	while (window.pump()) {
+			if (window.consumeSaveRequest()) {
+				GScene->df->inputImage();
+				int spp = GScene->sampleCount.load(std::memory_order_relaxed);
+				time_t t = time(nullptr);
+				struct tm lt; localtime_s(&lt, &t);
+				char ts[32]; strftime(ts, sizeof(ts), "%Y%m%d_%H%M%S", &lt);
+				std::string fname = GScene->name + "_" + std::to_string(spp) + "_" + ts + ".png";
+				GScene->camera->saveImage(GScene->df, fname);
+				window.showStatus("Saved " + fname);
+				LOG("interactive snapshot saved: " + fname);
+			}
 		int sceneReq = window.consumeSceneRequest();
 		if (sceneReq >= 0 && sceneReq < (int)scenes.size() && sceneReq != curIdx) {
 			window.showStatus("Loading " + scenes[sceneReq] + " ...");

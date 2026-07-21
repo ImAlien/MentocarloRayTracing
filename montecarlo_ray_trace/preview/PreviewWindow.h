@@ -51,6 +51,8 @@ public:
 	void setScenes(const std::vector<std::string>& names, int current) { scenes_ = names; currentScene_ = current; }
 	// Returns the scene index the user asked to switch to since the last call, or -1.
 	int consumeSceneRequest() { int r = pendingScene_; pendingScene_ = -1; return r; }
+	// Returns true once if the user pressed the save-snapshot key ('P') since the last call.
+	bool consumeSaveRequest() { bool r = saveRequest_; saveRequest_ = false; return r; }
 	// Rebind to a different scene's framebuffer (dimensions may differ).
 	void setSource(DataFrame* df);
 	void setSampleCounter(std::atomic<int>* c) { samples_ = c; }
@@ -88,6 +90,7 @@ private:
 	int lastMouseX_ = 0;
 	int lastMouseY_ = 0;
 	int wheel_ = 0;
+	bool saveRequest_ = false;   // set on 'P' key, consumed by the interactive loop
 
 	// scene switching
 	std::vector<std::string> scenes_;
